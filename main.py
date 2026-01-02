@@ -16,13 +16,18 @@ def add_bg_from_local(image_file):
         st.markdown(
         f"""
         <style>
-        /* 1. Background setup */
+        /* 1. Background and Containers */
         .stApp {{
             background-image: url("data:image/png;base64,{encoded_string.decode()}");
             background-attachment: fixed;
             background-size: cover;
         }}
-
+        [data-testid="stVerticalBlock"] {{
+            background-color: rgba(20, 20, 20, 0.9) !important;
+            padding: 30px;
+            border-radius: 15px;
+        }}
+        
         /* 2. Header Fixes */
         [data-testid="stHeader"] {{
             background-color: white !important;
@@ -48,14 +53,14 @@ def add_bg_from_local(image_file):
             background-color: #1a1a1a !important;
         }}
 
-        /* 6. GLOBAL TEXT FIXES - MANDATORY DOUBLE BRACKETS */
-        p, span, label, li, [data-testid="stMetricLabel"] {{
+       /* 3. Global Text & Headers */
+        p, span, label, li {{
             color: #FFFFFF !important;
         }}
         h1, h2, h3, h4, b, strong {{
             color: #FFB300 !important;
         }}
-
+        
         /* 7. OFFICIAL DATA TABLE - THE "INVISIBLE" FIX */
         div[data-testid="stTable"] {{
             background-color: rgba(0, 0, 0, 0.85) !important;
@@ -429,6 +434,7 @@ if st.button("Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
