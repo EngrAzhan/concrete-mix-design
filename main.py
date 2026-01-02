@@ -299,7 +299,7 @@ with col_slump1:
     st.markdown("---")
     try:
         # Make sure the file name matches exactly what you uploaded to GitHub
-        st.image("slump_combined.png", caption="Concrete Slump Test: Types & Procedure ", use_container_width=True)
+        st.image("slump_combined.png", caption="Concrete Slump Test:    Types & Procedure ", use_container_width=True)
     except:
         st.info("💡 Upload 'slump_combined.png' to your folder to display the technical diagram.")
 
@@ -454,6 +454,7 @@ if st.button("Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
