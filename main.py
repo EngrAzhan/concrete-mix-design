@@ -14,58 +14,60 @@ def add_bg_from_local(image_file):
         st.markdown(
         f"""
         <style>
-        /* Main background */
+        /* 1. Main background */
         .stApp {{
             background-image: url("data:image/png;base64,{encoded_string.decode()}");
             background-attachment: fixed;
             background-size: cover;
         }}
         
-        /* DARK GLASS EFFECT Content Box */
+        /* 2. Content Card (Glass effect) */
         [data-testid="stVerticalBlock"] {{
-            background-color: rgba(20, 20, 20, 0.88); 
+            background-color: rgba(20, 20, 20, 0.85) !important; 
             padding: 30px;
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
         }}
 
-        /* --- THE VISIBILITY FIX --- */
-        /* Forces ALL standard text, paragraphs, labels, and spans to white */
-        p, span, label, li, .stMarkdown, [data-testid="stMetricLabel"], .st-at, .st-ae, .st-af {{
+        /* 3. FORCE ALL TEXT TO PURE WHITE */
+        /* Targets paragraphs, markdown, labels, and all span elements */
+        p, span, label, li, div, .stMarkdown {{
             color: #FFFFFF !important;
             font-weight: 500 !important;
         }}
 
-        /* Forces all Headers to Safety Orange (Amber) */
+        /* 4. HEADERS: Safety Orange */
         h1, h2, h3, b, strong {{
             color: #FFB300 !important;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
         }}
 
-        /* Forces Metrics (the big numbers) to Bright White or Cyan for maximum visibility */
+        /* 5. METRIC VALUES (The Big Numbers) */
         [data-testid="stMetricValue"] {{
-            color: #FFFFFF !important; 
-            text-shadow: 0px 0px 5px rgba(0,0,0,1);
+            color: #00E5FF !important; /* Bright Cyan for numbers */
+        }}
+        
+        [data-testid="stMetricLabel"] p {{
+            color: #FFB300 !important; /* Orange for 'Wet Volume' etc. */
         }}
 
-        /* Sidebar visibility */
-        section[data-testid="stSidebar"] {{
-            background-color: rgba(10, 10, 10, 0.98) !important;
-        }}
-        section[data-testid="stSidebar"] label {{
-            color: #FFB300 !important;
-        }}
-
-        /* Table Text */
+        /* 6. TABLE TEXT: Making result rows bright white */
         .stTable td, .stTable th {{
             color: #FFFFFF !important;
+            background-color: rgba(0,0,0,0.2) !important;
+        }}
+
+        /* 7. SIDEBAR TEXT: Forcing orange labels */
+        [data-testid="stSidebar"] label {{
+            color: #FFB300 !important;
+            font-weight: bold !important;
         }}
         </style>
         """,
         unsafe_allow_html=True
         )
     except FileNotFoundError:
-        st.warning("Background image 'background.jpg' not found.")
+        st.warning("Background image not found.")
 
 add_bg_from_local('background.jpg')
 
@@ -223,6 +225,7 @@ def create_pdf():
 
 if st.button("Generate PDF Report"):
     st.download_button(label="📥 Download Result PDF", data=create_pdf(), file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
