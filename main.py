@@ -206,7 +206,7 @@ with col_inp:
     st.markdown("---")
     try:
         # Check if the file name matches your uploaded file exactly
-        st.image("image_ede32d.png", caption="Concrete Slump Test Procedure", use_container_width=True)
+        st.image("image_ede32d.png", caption="Concrete Mixture", use_container_width=True)
     except Exception:
         st.warning("⚠️ image_ede32d.png not found. Please check the filename in your folder.")
 
@@ -454,6 +454,7 @@ if st.button("Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
