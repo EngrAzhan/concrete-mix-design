@@ -22,47 +22,57 @@ def add_bg_from_local(image_file):
             background-size: cover;
         }}
 
-        /* 2. Fix visibility of Settings Icon & Borders */
-        /* 'color-scheme: dark' forces icons to turn white even in light theme */
+        /* 2. HEADER INTERFERENCE FIX */
+        /* This forces the top bar to be white with black icons so settings are visible */
+        [data-testid="stHeader"] {{
+            background-color: white !important;
+            border-bottom: 1px solid #ddd;
+        }}
+        [data-testid="stHeader"] svg {{
+            fill: black !important;
+        }}
+        
+        /* Fix the settings menu text itself */
+        div[data-testid="stToolbar"] {{
+            color: black !important;
+        }}
+
+        /* 3. Main Content Container - Dark Glass Effect */
         [data-testid="stVerticalBlock"] {{
-            background-color: rgba(20, 20, 20, 0.85) !important;
+            background-color: rgba(20, 20, 20, 0.88) !important;
             padding: 30px;
             border-radius: 15px;
-            color-scheme: dark !important; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            margin-top: 20px;
         }}
 
-        /* 3. Force all text types to White */
-        p, span, label, li, .stMarkdown, [data-testid="stMetricLabel"] {{
-            color: #FFFFFF !important;
-            font-weight: 500 !important;
-        }}
-
-        /* 4. Fix Methodology Code Blocks (Images 9 & 10 visibility) */
+        /* 4. Methodology Code Blocks Fix (Visible text in code boxes) */
         code {{
-            color: #FFB300 !important; /* Safety Orange for the numbers */
-            background-color: rgba(0, 0, 0, 0.4) !important;
+            color: #FFB300 !important;
+            background-color: #1a1a1a !important;
+            padding: 4px !important;
+            border-radius: 5px;
         }}
         pre {{
-            background-color: rgba(0, 0, 0, 0.5) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: #1a1a1a !important;
+            border: 1px solid #444 !important;
         }}
 
-        /* 5. Force Table Borders to be visible (Image 8 fix) */
-        table, th, td {{
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            color: white !important;
+        /* 5. Force all text to White in the dark container */
+        p, span, label, li, [data-testid="stMetricLabel"] {{
+            color: #FFFFFF !important;
         }}
-
-        /* 6. Force Headers to Safety Orange */
+        
+        /* 6. Headers and Metrics */
         h1, h2, h3, b, strong {{
             color: #FFB300 !important;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }}
+        [data-testid="stMetricValue"] {{
+            color: #FFFFFF !important;
         }}
 
-        /* 7. Sidebar styling */
-        [data-testid="stSidebar"] {{
-            background-color: rgba(10, 10, 10, 0.9) !important;
+        /* 7. Table Borders */
+        table, th, td {{
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
         }}
         </style>
         """,
@@ -272,6 +282,7 @@ def create_pdf():
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
