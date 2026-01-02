@@ -48,9 +48,9 @@ tab1, tab2 = st.tabs(["📊 Precise Results", "📝 How it Works (Formulas)"])
 with tab1:
     st.subheader("Mix Proportion Inputs")
     c_col, s_col, a_col = st.columns(3)
-    c_ratio = c_col.number_input("Cement Ratio", value=1.0000, format="%.4f")
-    s_ratio = s_col.number_input("Sand Ratio", value=2.0000, format="%.4f")
-    a_ratio = a_col.number_input("Stone Ratio", value=4.0000, format="%.4f")
+    c_ratio = c_col.number_input("Cement Ratio", value=1)
+    s_ratio = s_col.number_input("Sand Ratio", value=2)
+    a_ratio = a_col.number_input("Stone Ratio", value=4)
     
     total_ratio = c_ratio + s_ratio + a_ratio
     
@@ -95,5 +95,6 @@ with tab2:
     st.code(f"Cement Weight = {vol_c:.4f} × {u_dens_c:.4f} = {weight_c:.4f} {w_unit}")
     st.code(f"Sand Weight = {vol_s:.4f} × {u_dens_s:.4f} = {weight_s:.4f} {w_unit}")
     st.code(f"Stone Weight = {vol_a:.4f} × {u_dens_a:.4f} = {weight_a:.4f} {w_unit}")
+
 
 
