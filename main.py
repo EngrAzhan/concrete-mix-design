@@ -158,9 +158,17 @@ st.latex(r"V_{material} = \frac{\text{Ratio Part}}{\sum \text{Ratios}} \times V_
 st.code(f"Cement Vol = ({c_ratio:.4f} / {total_ratio:.4f}) × {dry_volume:.4f} = {vol_c:.4f} {v_unit}")
 
 st.markdown("### 4. Weight Conversion")
+st.write("We convert the calculated volume of each material into its required weight using the bulk densities provided in the sidebar.")
 st.latex(r"\text{Weight} = \text{Volume} \times \text{Density}")
-st.code(f"Cement: {vol_c:.4f} × {u_dens_c:.4f} = {weight_c:.4f} {w_unit}")
 
+# Displaying all three material weight calculations
+st.code(f"""
+Cement Weight: {vol_c:.4f} {v_unit} × {u_dens_c:.4f} = {weight_c:.4f} {w_unit}
+Sand Weight:   {vol_s:.4f} {v_unit} × {u_dens_s:.4f} = {weight_s:.4f} {w_unit}
+Stone Weight:  {vol_a:.4f} {v_unit} × {u_dens_a:.4f} = {weight_a:.4f} {w_unit}
+""")
+
+st.success(f"**Total Material Weight:** {weight_c + weight_s + weight_a:.4f} {w_unit}")
 # --- PDF GENERATION ---
 def create_pdf():
     pdf = FPDF()
@@ -177,6 +185,7 @@ def create_pdf():
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
