@@ -14,35 +14,44 @@ def add_bg_from_local(image_file):
         st.markdown(
         f"""
         <style>
-        /* The main background */
+        /* Main background */
         .stApp {{
             background-image: url("data:image/png;base64,{encoded_string.decode()}");
             background-attachment: fixed;
             background-size: cover;
         }}
         
-        /* DARK GLASS EFFECT: Making the content boxes dark and semi-transparent */
+        /* DARK GLASS CARD: Optimized for contrast */
         [data-testid="stVerticalBlock"] {{
-            background-color: rgba(30, 30, 30, 0.85); /* Dark grey with transparency */
-            padding: 30px;
+            background-color: rgba(15, 15, 15, 0.9); 
+            padding: 40px;
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px); /* Blurs the background image behind the box */
-            color: #FFFFFF; /* Makes text white */
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
         }}
 
-        /* Making headers pop with an accent color */
-        h1, h2, h3 {{
-            color: #FFB300 !important; /* Safety Orange/Amber */
+        /* PURE WHITE TEXT FORCE */
+        p, li, label, .stMarkdown, [data-testid="stMetricLabel"], span, div {{
+            color: #FFFFFF !important;
+            font-weight: 500 !important;
         }}
 
-        /* Styling the sidebar to match */
+        /* TITLES: Safety Orange */
+        h1, h2, h3, b, strong {{
+            color: #FFB300 !important;
+        }}
+
+        /* METRICS: Neon Cyan */
+        [data-testid="stMetricValue"] {{
+            color: #00E5FF !important;
+            font-family: 'Courier New', Courier, monospace;
+        }}
+
+        /* SIDEBAR STYLING */
         section[data-testid="stSidebar"] {{
-            background-color: rgba(20, 20, 20, 0.95) !important;
+            background-color: #0E1117 !important;
         }}
-
-        /* Adjusting Metric Labels */
-        [data-testid="stMetricLabel"] {{
+        section[data-testid="stSidebar"] label {{
             color: #FFB300 !important;
         }}
         </style>
@@ -59,18 +68,16 @@ with st.sidebar:
     st.header("📐 1. Dimensions")
     unit_system = st.selectbox("Unit System", ["Metric (SI)", "Imperial (BG)"])
     
+    l = st.number_input("Length", value=1.0000, format="%.4f")
+    w = st.number_input("Width", value=1.0000, format="%.4f")
+    h = st.number_input("Height", value=1.0000, format="%.4f")
+    
     if unit_system == "Metric (SI)":
-        l = st.number_input("Length (m)", value=1.0000, format="%.4f")
-        w = st.number_input("Width (m)", value=1.0000, format="%.4f")
-        h = st.number_input("Height (m)", value=1.0000, format="%.4f")
         v_unit, w_unit = "m³", "kg"
-        def_c, def_s, def_a = 1440.0000, 1600.0000, 1550.0000
+        def_c, def_s, def_a = 1440.0, 1600.0, 1550.0
     else:
-        l = st.number_input("Length (ft)", value=1.0000, format="%.4f")
-        w = st.number_input("Width (ft)", value=1.0000, format="%.4f")
-        h = st.number_input("Height (ft)", value=1.0000, format="%.4f")
         v_unit, w_unit = "ft³", "lb"
-        def_c, def_s, def_a = 94.0000, 100.0000, 105.0000
+        def_c, def_s, def_a = 94.0, 100.0, 105.0
 
     st.header("⚙️ 2. Design Factors")
     dry_factor = st.number_input("Dry Volume Factor", value=1.5400, format="%.4f")
@@ -83,35 +90,7 @@ with st.sidebar:
     u_dens_a = st.number_input("Stone Density", value=def_a, format="%.4f")
 
     st.header("💧 4. Water Content")
-    wc_ratio = st.number_input("Water-Cement (W/C) Ratio", value=0.5000, format="%.4f")
-
-# --- 3D VISUALIZATION LOGIC ---
-def draw_3d_specimen(l, w, h):
-    fig = go.Figure(data=[
-        go.Mesh3d(
-            # 8 vertices of the prism
-            x=[0, l, l, 0, 0, l, l, 0],
-            y=[0, 0, w, w, 0, 0, w, w],
-            z=[0, 0, 0, 0, h, h, h, h],
-            i=[7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2],
-            j=[3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3],
-            k=[0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6],
-            opacity=0.7,
-            color='lightgrey',
-            flatshading=True
-        )
-    ])
-    fig.update_layout(
-        scene=dict(
-            xaxis=dict(nticks=4, range=[-1, max(l,w,h)+1]),
-            yaxis=dict(nticks=4, range=[-1, max(l,w,h)+1]),
-            zaxis=dict(nticks=4, range=[-1, max(l,w,h)+1]),
-            aspectmode='data'
-        ),
-        margin=dict(l=0, r=0, b=0, t=0),
-        height=400
-    )
-    return fig
+    wc_ratio = st.number_input("W/C Ratio", value=0.5000, format="%.4f")
 
 # --- CALCULATIONS ---
 wet_volume = l * w * h
@@ -124,21 +103,34 @@ elif l > w and l > h: shape_name = "Beam"
 elif h > l and h > w: shape_name = "Column"
 else: shape_name = "Specimen"
 
-# --- MAIN PAGE DISPLAY ---
-st.title(f"🏗️ Concrete Mix Design Calculator")
+# --- MAIN PAGE ---
+st.title(f"🏗️ 3D {shape_name} Mix Calculator")
 st.markdown("---")
 
 col_vis, col_inp = st.columns([1, 1])
 
 with col_vis:
-    st.subheader(f"3D {shape_name} Visualization")
-    st.plotly_chart(draw_3d_specimen(l, w, h), use_container_width=True)
+    st.subheader(f"Visualization")
+    # Plotly 3D Specimen
+    fig = go.Figure(data=[go.Mesh3d(
+        x=[0, l, l, 0, 0, l, l, 0], y=[0, 0, w, w, 0, 0, w, w], z=[0, 0, 0, 0, h, h, h, h],
+        i=[7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2], j=[3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3],
+        k=[0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6],
+        opacity=0.8, color='#A9A9A9', flatshading=True
+    )])
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+                      scene=dict(xaxis=dict(gridcolor='gray', color='white'),
+                                 yaxis=dict(gridcolor='gray', color='white'),
+                                 zaxis=dict(gridcolor='gray', color='white'),
+                                 aspectmode='data'),
+                      margin=dict(l=0, r=0, b=0, t=0), height=400)
+    st.plotly_chart(fig, use_container_width=True)
 
 with col_inp:
-    st.subheader("Mix Proportion Inputs")
-    c_ratio = st.number_input("Cement Ratio", value=1.0000, format="%.4f")
-    s_ratio = st.number_input("Sand Ratio", value=2.0000, format="%.4f")
-    a_ratio = st.number_input("Stone Ratio", value=4.0000, format="%.4f")
+    st.subheader("Mix Proportions")
+    c_ratio = st.number_input("Cement Ratio", value=1.0, format="%.4f")
+    s_ratio = st.number_input("Sand Ratio", value=2.0, format="%.4f")
+    a_ratio = st.number_input("Stone Ratio", value=4.0, format="%.4f")
     
     total_ratio = c_ratio + s_ratio + a_ratio
     vol_c = (c_ratio / total_ratio) * dry_volume
@@ -150,16 +142,14 @@ with col_inp:
     weight_a = vol_a * u_dens_a
     weight_water = wc_ratio * weight_c
 
-# Results Section
-
+# Results
 m1, m2 = st.columns(2)
-m1.metric("Total Wet Volume", f"{wet_volume:.4f} {v_unit}")
-m2.metric("Total Dry Volume (+Wastage)", f"{dry_volume:.4f} {v_unit}")
+m1.metric("Wet Volume", f"{wet_volume:.4f} {v_unit}")
+m2.metric("Dry Volume", f"{dry_volume:.4f} {v_unit}")
 
 res_df = pd.DataFrame({
-    "Material": ["Cement", "Sand", "Stone"],
-    f"Volume ({v_unit})": [f"{vol_c:.4f}", f"{vol_s:.4f}", f"{vol_a:.4f}"],
-    f"Weight ({w_unit})": [f"{weight_c:.4f}", f"{weight_s:.4f}", f"{weight_a:.4f}"]
+    "Material": ["Cement", "Sand", "Stone", "Water"],
+    f"Weight ({w_unit})": [f"{weight_c:.4f}", f"{weight_s:.4f}", f"{weight_a:.4f}", f"{weight_water:.4f}"]
 })
 st.table(res_df)
 
@@ -167,58 +157,55 @@ st.table(res_df)
 st.markdown("---")
 st.header("🧮 Step-by-Step Methodology")
 
+# Step 1
 st.markdown(f"### 1. {shape_name} Volume Calculation")
 
 st.latex(r"V_{wet} = L \times W \times H")
 st.code(f"{l:.4f} × {w:.4f} × {h:.4f} = {wet_volume:.4f} {v_unit}")
 
+# Step 2
 st.markdown("### 2. Shrinkage and Wastage Adjustment")
 
 st.latex(r"V_{dry} = V_{wet} \times \text{Dry Factor} \times \text{Wastage Factor}")
 st.code(f"{wet_volume:.4f} × {dry_factor:.4f} × {wastage_factor:.4f} = {dry_volume:.4f} {v_unit}")
 
+# Step 3
 st.markdown("### 3. Volumetric Proportioning")
 st.latex(r"V_{material} = \frac{\text{Ratio Part}}{\sum \text{Ratios}} \times V_{dry}")
 st.code(f"Cement Vol = ({c_ratio:.4f} / {total_ratio:.4f}) × {dry_volume:.4f} = {vol_c:.4f} {v_unit}")
 
+# Step 4
 st.markdown("### 4. Weight Conversion")
-st.write("We convert the calculated volume of each material into its required weight using the bulk densities provided in the sidebar.")
+
 st.latex(r"\text{Weight} = \text{Volume} \times \text{Density}")
-
-st.markdown("### 5. Water Content Calculation")
-st.write("Water requirement is calculated based on the weight of the cement using the Water-Cement ratio.")
-st.latex(r"W_{water} = W_{cement} \times \text{W/C Ratio}")
-st.code(f"Water Weight: {weight_c:.4f} × {wc_ratio:.4f} = {weight_water:.4f} {w_unit}")
-
-# Optional: Convert to Liters for Metric
-if unit_system == "Metric (SI)":
-    st.info(f"💡 Since 1kg of water ≈ 1 Liter, you need approximately **{weight_water:.2f} Liters** of water.")
-
-# Displaying all three material weight calculations
 st.code(f"""
 Cement Weight: {vol_c:.4f} {v_unit} × {u_dens_c:.4f} = {weight_c:.4f} {w_unit}
 Sand Weight:   {vol_s:.4f} {v_unit} × {u_dens_s:.4f} = {weight_s:.4f} {w_unit}
 Stone Weight:  {vol_a:.4f} {v_unit} × {u_dens_a:.4f} = {weight_a:.4f} {w_unit}
 """)
 
-st.success(f"**Total Material Weight:** {weight_c + weight_s + weight_a:.4f} {w_unit}")
-# --- PDF GENERATION ---
+# Step 5
+st.markdown("### 5. Water Content Calculation")
+
+st.latex(r"W_{water} = W_{cement} \times \text{W/C Ratio}")
+st.code(f"Water Weight: {weight_c:.4f} × {wc_ratio:.4f} = {weight_water:.4f} {w_unit}")
+
+st.success(f"**Total Material Weight:** {weight_c + weight_s + weight_a + weight_water:.4f} {w_unit}")
+
+# --- PDF ---
 def create_pdf():
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", 'B', 16)
-    pdf.cell(200, 10, f"{shape_name} Concrete Mix Design Report", ln=True, align='C')
-    pdf.ln(10)
+    pdf.cell(200, 10, f"{shape_name} Design Report", ln=True, align='C')
     pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, f"Shape Detected: {shape_name}", ln=True)
-    pdf.cell(200, 10, f"Dimensions: {l}x{w}x{h} {v_unit[0]}", ln=True)
-    pdf.cell(200, 10, f"Total Weight: {weight_c + weight_s + weight_a:.4f} {w_unit}", ln=True)
+    pdf.ln(10)
+    pdf.cell(200, 10, f"Cement: {weight_c:.4f} {w_unit}", ln=True)
+    pdf.cell(200, 10, f"Water: {weight_water:.4f} {w_unit}", ln=True)
     return pdf.output(dest='S').encode('latin-1')
 
 if st.button("Generate PDF Report"):
-    pdf_out = create_pdf()
-    st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
-
+    st.download_button(label="📥 Download Report", data=create_pdf(), file_name="Concrete_Report.pdf", mime="application/pdf")
 
 
 
