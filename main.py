@@ -1,125 +1,98 @@
 import streamlit as st
-from fpdf import FPDF
 import pandas as pd
 
 # --- PAGE SETUP ---
-st.set_page_config(page_title="Global Concrete Calculator", layout="wide")
+st.set_page_config(page_title="Transparent Concrete Calc", layout="wide")
 
-# --- PHYSICAL CONSTANTS & CONVERSIONS ---
-# Base densities in SI (kg/m3)
-DENSITY_SI = {"Cement": 1440, "Sand": 1600, "Stone": 1550}
-# Base densities in BG (lb/ft3)
-DENSITY_BG = {"Cement": 94, "Sand": 100, "Stone": 105}
+st.title("🏗️ Concrete Mix Design & Quantity Calculator")
+st.markdown("---")
 
-# --- PDF GENERATION ---
-def create_pdf(df_vol, df_weight, wet_v, dry_v, v_unit, w_unit):
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", 'B', 16)
-    pdf.cell(200, 10, "Concrete Mix & Quantity Report", ln=True, align='C')
-    pdf.set_font("Arial", size=12)
-    pdf.ln(10)
-    pdf.cell(200, 10, f"Wet Volume: {wet_v:.3f} {v_unit}", ln=True)
-    pdf.cell(200, 10, f"Dry Volume: {dry_v:.3f} {v_unit}", ln=True)
-    pdf.ln(10)
-    pdf.cell(200, 10, "Material Breakdown:", ln=True)
-    for i in range(len(df_vol)):
-        m = df_vol.iloc[i]['Material']
-        v = df_vol.iloc[i]['Volume']
-        w = df_weight.iloc[i][f'Weight ({w_unit})']
-        pdf.cell(200, 10, f"- {m}: {v} {v_unit} | {w} {w_unit}", ln=True)
-    return pdf.output(dest='S').encode('latin-1')
-
-# --- SIDEBAR: SYSTEM & DIMENSIONS ---
+# --- SIDEBAR: DIMENSIONS & USER-DEFINED DENSITIES ---
 with st.sidebar:
-    st.header("🌍 System Selection")
-    system = st.radio("Choose Unit System", ["Metric (SI) - m, kg", "Imperial (BG) - ft, lb"])
+    st.header("📐 1. Dimensions")
+    unit_system = st.selectbox("Unit System", ["Metric (SI)", "Imperial (BG)"])
     
-    st.write("---")
-    st.header("📏 Dimensions")
-    
-    if "Metric" in system:
+    if unit_system == "Metric (SI)":
+        l = st.number_input("Length (m)", value=1.0)
+        w = st.number_input("Width (m)", value=1.0)
+        h = st.number_input("Height (m)", value=1.0)
         v_unit, w_unit = "m³", "kg"
-        l = st.number_input("Length (meters)", value=1.0)
-        w = st.number_input("Width (meters)", value=1.0)
-        h = st.number_input("Height (meters)", value=1.0)
+        # Default SI Densities
+        def_c, def_s, def_a = 1440.0, 1600.0, 1550.0
     else:
+        l = st.number_input("Length (ft)", value=1.0)
+        w = st.number_input("Width (ft)", value=1.0)
+        h = st.number_input("Height (ft)", value=1.0)
         v_unit, w_unit = "ft³", "lb"
-        l = st.number_input("Length (feet)", value=1.0)
-        w = st.number_input("Width (feet)", value=1.0)
-        h = st.number_input("Height (feet)", value=1.0)
+        # Default Imperial Densities
+        def_c, def_s, def_a = 94.0, 100.0, 105.0
 
-    st.write("---")
-    st.header("⚙️ Design Factors")
-    dry_factor = st.number_input("Dry Factor (Shrinkage)", value=1.54)
-    wastage = st.number_input("Wastage (Decimal)", value=0.05)
-
-# --- MAIN SECTION ---
-st.title("🏗️ Concrete Quantity Estimator (SI & BG)")
+    st.header("⚖️ 2. Material Densities")
+    st.caption(f"Input bulk density in {w_unit}/{v_unit}")
+    u_dens_c = st.number_input("Cement Density", value=def_c)
+    u_dens_s = st.number_input("Sand (FA) Density", value=def_s)
+    u_dens_a = st.number_input("Stone (CA) Density", value=def_a)
 
 # --- CALCULATIONS ---
-wet_vol = l * w * h
-dry_vol = (wet_vol * dry_factor) * (1 + wastage)
+wet_volume = l * w * h
+dry_factor = 1.54  # Standard shrinkage factor
+wastage = 1.05    # 5% safety margin
+dry_volume = wet_volume * dry_factor * wastage
 
-st.subheader("Mix Proportions (C : FA : CA)")
-c1, c2, c3 = st.columns(3)
-with c1: c_ratio = st.number_input("Cement", value=1.0)
-with c2: fa_ratio = st.number_input("Fine Aggregate", value=2.0)
-with c3: ca_ratio = st.number_input("Coarse Aggregate", value=4.0)
+# --- TABS FOR USER EXPERIENCE ---
+tab1, tab2 = st.tabs(["📊 Calculator Results", "📝 How it Works (Formulas)"])
 
-total_ratio = c_ratio + fa_ratio + ca_ratio
-
-# Calculate Individual Volumes
-vol_c = (c_ratio / total_ratio) * dry_vol
-vol_fa = (fa_ratio / total_ratio) * dry_vol
-vol_ca = (ca_ratio / total_ratio) * dry_vol
-
-# Calculate Individual Weights
-if "Metric" in system:
-    weight_c = vol_c * DENSITY_SI["Cement"]
-    weight_fa = vol_fa * DENSITY_SI["Sand"]
-    weight_ca = vol_ca * DENSITY_SI["Stone"]
-    bag_text = f"{round(weight_c/50, 1)} Bags (50kg each)"
-else:
-    weight_c = vol_c * DENSITY_BG["Cement"]
-    weight_fa = vol_fa * DENSITY_BG["Sand"]
-    weight_ca = vol_ca * DENSITY_BG["Stone"]
-    bag_text = f"{round(weight_c/94, 1)} Bags (94lb each)"
-
-# --- DISPLAY ---
-col_v1, col_v2 = st.columns(2)
-col_v1.metric("Wet Volume", f"{wet_vol:.3f} {v_unit}")
-col_v2.metric("Dry Volume", f"{dry_vol:.3f} {v_unit}")
-
-st.write("---")
-tab_res, tab_info = st.tabs(["📊 Quantities", "📖 Unit Specs"])
-
-with tab_res:
-    df_vol = pd.DataFrame({
-        "Material": ["Cement", "Fine Aggregate", "Coarse Aggregate"],
-        "Volume": [round(vol_c, 3), round(vol_fa, 3), round(vol_ca, 3)],
-        "Unit": [v_unit, v_unit, v_unit]
-    })
-    st.subheader(f"Volumes ({v_unit})")
-    st.table(df_vol)
+with tab1:
+    st.subheader("Mix Proportion Inputs")
+    c_col, s_col, a_col = st.columns(3)
+    c_ratio = c_col.number_input("Cement Ratio", value=1.0)
+    s_ratio = s_col.number_input("Sand Ratio", value=2.0)
+    a_ratio = a_col.number_input("Stone Ratio", value=4.0)
     
-    df_weight = pd.DataFrame({
-        "Material": ["Cement", "Fine Aggregate", "Coarse Aggregate"],
-        f"Weight ({w_unit})": [round(weight_c, 2), round(weight_fa, 2), round(weight_ca, 2)]
+    total_ratio = c_ratio + s_ratio + a_ratio
+    
+    # Material Volumes
+    vol_c = (c_ratio / total_ratio) * dry_volume
+    vol_s = (s_ratio / total_ratio) * dry_volume
+    vol_a = (a_ratio / total_ratio) * dry_volume
+    
+    # Material Weights (Using User Inputs)
+    weight_c = vol_c * u_dens_c
+    weight_s = vol_s * u_dens_s
+    weight_a = vol_a * u_dens_a
+
+    # Metrics
+    m1, m2 = st.columns(2)
+    m1.metric("Total Wet Volume", f"{wet_volume:.3f} {v_unit}")
+    m2.metric("Total Dry Volume (+Wastage)", f"{dry_volume:.3f} {v_unit}")
+
+    # Results Table
+    res_df = pd.DataFrame({
+        "Material": ["Cement", "Fine Aggregate (Sand)", "Coarse Aggregate (Stone)"],
+        f"Volume ({v_unit})": [round(vol_c, 3), round(vol_s, 3), round(vol_a, 3)],
+        f"Weight ({w_unit})": [round(weight_c, 2), round(weight_s, 2), round(weight_a, 2)]
     })
-    st.subheader(f"Weights ({w_unit})")
-    st.table(df_weight)
-    st.success(f"**Packing Hint:** {bag_text}")
+    st.table(res_df)
 
-with tab_info:
-    st.markdown("### Conversion & Density Log")
-    if "Metric" in system:
-        st.write("Using SI System: 1m³ concrete requires ~1.54m³ dry materials.")
-        st.write(f"Cement Density: {DENSITY_SI['Cement']} kg/m³")
-    else:
-        st.write("Using BG System: 1ft³ concrete requires ~1.54ft³ dry materials.")
-        st.write(f"Cement Density: {DENSITY_BG['Cement']} lb/ft³")
-
-# --- EXPORT ---
-pdf_data = create_pdf(df_vol, df_weight, wet_vol, dry_vol, v_unit, w_unit)
-st.download_button("📥 Download Report", data=pdf_data, file_name="Concrete_Design_Report.pdf")
+with tab2:
+    st.header("Step-by-Step Mix Design Logic")
+    
+    st.markdown("""
+    ### 1. Volume Calculation
+    First, we find the volume of the structure.
+    """)
+    st.code(f"Wet Volume = Length ({l}) × Width ({w}) × Height ({h}) = {wet_volume:.3f} {v_unit}")
+    
+    st.markdown("### 2. Conversion to Dry Volume")
+    st.write("Concrete shrinks when water is added. We multiply by a **Dry Factor (1.54)** and a **Wastage Factor (1.05)**.")
+    st.code(f"Dry Volume = {wet_volume:.3f} × 1.54 × 1.05 = {dry_volume:.3f} {v_unit}")
+    
+    st.markdown("### 3. Ratio Proportioning")
+    st.write(f"Sum of Ratios = {c_ratio} + {s_ratio} + {a_ratio} = **{total_ratio}**")
+    st.code(f"Cement Vol = ({c_ratio} / {total_ratio}) × {dry_volume:.3f} = {vol_c:.3f} {v_unit}")
+    
+    st.markdown("### 4. Weight Calculation (Using your Density Inputs)")
+    st.write(f"Weight = Volume × User-Input Density")
+    st.code(f"Cement Weight = {vol_c:.3f} × {u_dens_c} = {weight_c:.2f} {w_unit}")
+    st.code(f"Sand Weight = {vol_s:.3f} × {u_dens_s} = {weight_s:.2f} {w_unit}")
+    st.code(f"Stone Weight = {vol_a:.3f} × {u_dens_a} = {weight_a:.2f} {w_unit}")
