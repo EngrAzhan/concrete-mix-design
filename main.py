@@ -66,20 +66,41 @@ def add_bg_from_local(image_file):
             border: 1px solid #444 !important;
         }}
 
-        /* 6. GLOBAL TEXT & TABLE FIXES */
-        p, span, label, li, [data-testid="stMetricLabel"] {{
+        /* 6. GLOBAL TEXT & TABLE FIXES - HIGH CONTRAST */
+        p, span, label, li, [data-testid="stMetricLabel"] {
             color: #FFFFFF !important;
-        }}
-        h1, h2, h3, b, strong {{
+        }
+        h1, h2, h3, b, strong {
             color: #FFB300 !important;
-        }}
-        [data-testid="stMetricValue"] {{
+        }
+        [data-testid="stMetricValue"] {
             color: #FFFFFF !important;
-        }}
-        table, th, td {{
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            color: white !important;
-        }}
+        }
+
+        /* This fixes the "Invisible" Official Data Table issue */
+        [data-testid="stTable"] {
+            background-color: rgba(0, 0, 0, 0.7) !important;
+            border-radius: 10px !important;
+            padding: 10px !important;
+        }
+        
+        table {
+            color: #FFFFFF !important;
+            border-collapse: collapse !important;
+            width: 100% !important;
+        }
+
+        thead tr th {
+            background-color: #FFB300 !important; /* Orange background */
+            color: #000000 !important; /* Black text for readability */
+            font-weight: bold !important;
+        }
+
+        tbody tr td {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            color: #FFFFFF !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
         </style>
         """,
         unsafe_allow_html=True
@@ -430,6 +451,7 @@ if st.button("Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
