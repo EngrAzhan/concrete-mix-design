@@ -275,7 +275,7 @@ st.header("📋 Standards & Recommended Workability")
 # 1. Interactive Slump Selection
 col_slump1, col_slump2 = st.columns([1, 2])
 with col_slump1:
-    st.subheader("💧 Target Slump")
+    st.subheader("🍙 Target Slump")
     slump_val = st.number_input("Enter Target Slump (mm)", value=100, step=5)
     
     # Selection logic based on ACI 211.1
@@ -454,6 +454,7 @@ if st.button("Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
