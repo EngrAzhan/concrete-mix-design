@@ -7,7 +7,6 @@ from fpdf import FPDF
 # --- PAGE SETUP ---
 st.set_page_config(page_title="Concrete Calc - Pro 3D Edition", layout="wide")
 
-# --- FUNCTION TO SET LOCAL BACKGROUND ---
 def add_bg_from_local(image_file):
     try:
         with open(image_file, "rb") as f:
@@ -15,16 +14,36 @@ def add_bg_from_local(image_file):
         st.markdown(
         f"""
         <style>
+        /* The main background */
         .stApp {{
             background-image: url("data:image/png;base64,{encoded_string.decode()}");
             background-attachment: fixed;
             background-size: cover;
         }}
+        
+        /* DARK GLASS EFFECT: Making the content boxes dark and semi-transparent */
         [data-testid="stVerticalBlock"] {{
-            background-color: rgba(255, 255, 255, 0.94);
+            background-color: rgba(30, 30, 30, 0.85); /* Dark grey with transparency */
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px); /* Blurs the background image behind the box */
+            color: #FFFFFF; /* Makes text white */
+        }}
+
+        /* Making headers pop with an accent color */
+        h1, h2, h3 {{
+            color: #FFB300 !important; /* Safety Orange/Amber */
+        }}
+
+        /* Styling the sidebar to match */
+        section[data-testid="stSidebar"] {{
+            background-color: rgba(20, 20, 20, 0.95) !important;
+        }}
+
+        /* Adjusting Metric Labels */
+        [data-testid="stMetricLabel"] {{
+            color: #FFB300 !important;
         }}
         </style>
         """,
@@ -199,6 +218,7 @@ def create_pdf():
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
