@@ -271,6 +271,14 @@ with col_slump1:
     
     st.markdown(f"**Workability Class:** :{color}[{workability}]")
 
+    # --- ADDED COMBINED SLUMP IMAGE HERE ---
+    st.markdown("---")
+    try:
+        # Make sure the file name matches exactly what you uploaded to GitHub
+        st.image("slump_combined.png", caption="Concrete Slump Test: Procedure & Results", use_container_width=True)
+    except:
+        st.info("💡 Upload 'slump_combined.png' to your folder to display the technical diagram.")
+
 with col_slump2:
     st.subheader("ACI 211.1 Reference Guide")
     st.write("Recommended slumps for various types of construction (Table 6.3.1):")
@@ -422,6 +430,7 @@ if st.button("Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
