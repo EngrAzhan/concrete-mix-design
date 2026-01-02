@@ -108,17 +108,17 @@ with st.sidebar:
         def_c, def_s, def_a = 94.0000, 100.0000, 105.0000
 
     st.header("⚙️ 2. Design Factors")
-    dry_factor = st.number_input("Dry Volume Factor", value=1.5400, format="%.4f")
-    wastage_percent = st.number_input("Wastage (%)", value=5.0000, format="%.4f")
+    dry_factor = st.number_input("Dry Volume Factor", value=1.54)
+    wastage_percent = st.number_input("Wastage (%)", value=5)
     wastage_factor = 1 + (wastage_percent / 100)
 
     st.header("⚖️ 3. Material Densities")
-    u_dens_c = st.number_input("Cement Density", value=def_c, format="%.4f")
-    u_dens_s = st.number_input("Sand Density", value=def_s, format="%.4f")
-    u_dens_a = st.number_input("Stone Density", value=def_a, format="%.4f")
+    u_dens_c = st.number_input("Cement Density", value=def_c)
+    u_dens_s = st.number_input("Sand Density", value=def_s)
+    u_dens_a = st.number_input("Stone Density", value=def_a)
 
     st.header("💧 4. Water Content")
-    wc_ratio = st.number_input("Water-Cement (W/C) Ratio", value=0.5000, format="%.4f")
+    wc_ratio = st.number_input("Water-Cement (W/C) Ratio", value=0.50)
 
 # --- 3D VISUALIZATION LOGIC ---
 def draw_3d_specimen(l, w, h):
@@ -275,7 +275,7 @@ with col_slump1:
     st.markdown("---")
     try:
         # Make sure the file name matches exactly what you uploaded to GitHub
-        st.image("slump_combined.png", caption="Concrete Slump Test: Procedure & Results", use_container_width=True)
+        st.image("slump_combined.png", caption="Concrete Slump Test: Types & Procedure ", use_container_width=True)
     except:
         st.info("💡 Upload 'slump_combined.png' to your folder to display the technical diagram.")
 
@@ -430,6 +430,7 @@ if st.button("Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
