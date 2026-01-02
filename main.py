@@ -15,64 +15,69 @@ def add_bg_from_local(image_file):
         st.markdown(
         f"""
         <style>
-        /* 1. Set the background image */
+        /* 1. Background setup */
         .stApp {{
             background-image: url("data:image/png;base64,{encoded_string.decode()}");
             background-attachment: fixed;
             background-size: cover;
         }}
 
-        /* 2. HEADER INTERFERENCE FIX */
-        /* This forces the top bar to be white with black icons so settings are visible */
+        /* 2. FIX: SETTINGS ICON & HEADER (Image cff156) */
         [data-testid="stHeader"] {{
             background-color: white !important;
             border-bottom: 1px solid #ddd;
         }}
         [data-testid="stHeader"] svg {{
-            fill: black !important;
-        }}
-        
-        /* Fix the settings menu text itself */
-        div[data-testid="stToolbar"] {{
-            color: black !important;
+            fill: #111 !important;
         }}
 
-        /* 3. Main Content Container - Dark Glass Effect */
+        /* 3. MAIN CONTENT CONTAINER */
         [data-testid="stVerticalBlock"] {{
-            background-color: rgba(20, 20, 20, 0.88) !important;
+            background-color: rgba(20, 20, 20, 0.9) !important;
             padding: 30px;
             border-radius: 15px;
             margin-top: 20px;
         }}
 
-        /* 4. Methodology Code Blocks Fix (Visible text in code boxes) */
+        /* 4. FIX: INVISIBLE PDF BUTTON (The white-on-white issue) */
+        /* This forces the button to have a visible orange border and dark background */
+        div.stButton > button {{
+            background-color: #FFB300 !important;
+            color: #000000 !important;
+            border: 2px solid #FFB300 !important;
+            font-weight: bold !important;
+            width: 100%;
+        }}
+        div.stButton > button:hover {{
+            background-color: #e6a100 !important;
+            color: #ffffff !important;
+        }}
+
+        /* 5. FIX: METHODOLOGY BOXES (Image d04446 / d05b4b) */
         code {{
             color: #FFB300 !important;
             background-color: #1a1a1a !important;
-            padding: 4px !important;
-            border-radius: 5px;
+            padding: 2px 5px !important;
+            border-radius: 4px;
         }}
         pre {{
             background-color: #1a1a1a !important;
             border: 1px solid #444 !important;
         }}
 
-        /* 5. Force all text to White in the dark container */
+        /* 6. GLOBAL TEXT & TABLE FIXES */
         p, span, label, li, [data-testid="stMetricLabel"] {{
             color: #FFFFFF !important;
         }}
-        
-        /* 6. Headers and Metrics */
         h1, h2, h3, b, strong {{
             color: #FFB300 !important;
         }}
         [data-testid="stMetricValue"] {{
             color: #FFFFFF !important;
         }}
-
-        /* 7. Table Borders */
         table, th, td {{
             border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
         }}
         </style>
         """,
@@ -282,6 +287,7 @@ def create_pdf():
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
