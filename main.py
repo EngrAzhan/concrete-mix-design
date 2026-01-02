@@ -23,13 +23,9 @@ def add_bg_from_local(image_file):
             background-size: cover;
         }}
 
-        /* 2. FIX: SETTINGS ICON & HEADER (Image cff156) */
+        /* 2. Header Fixes */
         [data-testid="stHeader"] {{
             background-color: white !important;
-            border-bottom: 1px solid #ddd;
-        }}
-        [data-testid="stHeader"] svg {{
-            fill: #111 !important;
         }}
 
         /* 3. MAIN CONTENT CONTAINER */
@@ -37,73 +33,52 @@ def add_bg_from_local(image_file):
             background-color: rgba(20, 20, 20, 0.9) !important;
             padding: 30px;
             border-radius: 15px;
-            margin-top: 20px;
         }}
 
-        /* 4. FIX: INVISIBLE PDF BUTTON (The white-on-white issue) */
-        /* This forces the button to have a visible orange border and dark background */
+        /* 4. BUTTON STYLING */
         div.stButton > button {{
             background-color: #FFB300 !important;
             color: #000000 !important;
-            border: 2px solid #FFB300 !important;
             font-weight: bold !important;
-            width: 100%;
-        }}
-        div.stButton > button:hover {{
-            background-color: #e6a100 !important;
-            color: #ffffff !important;
         }}
 
-        /* 5. FIX: METHODOLOGY BOXES (Image d04446 / d05b4b) */
-        code {{/* 6. GLOBAL TEXT & TABLE FIXES - CORRECTED SYNTAX */
+        /* 5. CODE BOXES */
+        code {{
+            color: #FFB300 !important;
+            background-color: #1a1a1a !important;
+        }}
+
+        /* 6. GLOBAL TEXT FIXES - MANDATORY DOUBLE BRACKETS */
         p, span, label, li, [data-testid="stMetricLabel"] {{
             color: #FFFFFF !important;
         }}
-        h1, h2, h3, b, strong {{
+        h1, h2, h3, h4, b, strong {{
             color: #FFB300 !important;
         }}
-        [data-testid="stMetricValue"] {{
-            color: #FFFFFF !important;
-        }}
 
-        /* FORCING TABLE VISIBILITY */
+        /* 7. OFFICIAL DATA TABLE - THE "INVISIBLE" FIX */
         div[data-testid="stTable"] {{
-            background-color: rgba(0, 0, 0, 0.85) !important; /* Darker background for contrast */
-            border: 2px solid #FFB300 !important; /* Bold orange border */
+            background-color: rgba(0, 0, 0, 0.85) !important;
+            border: 2px solid #FFB300 !important;
             border-radius: 10px !important;
             padding: 10px !important;
-            margin-top: 10px !important;
         }}
-        
+
         div[data-testid="stTable"] table {{
             color: #FFFFFF !important;
-            width: 100% !important;
         }}
 
         div[data-testid="stTable"] thead tr th {{
-            background-color: #FFB300 !important; /* Bright orange header */
-            color: #000000 !important; /* Black text for readability */
+            background-color: #FFB300 !important;
+            color: #000000 !important;
             font-weight: bold !important;
-            border: 1px solid #444 !important;
         }}
 
         div[data-testid="stTable"] tbody tr td {{
             background-color: rgba(255, 255, 255, 0.05) !important;
             color: #FFFFFF !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            text-align: center !important;
         }}
-            color: #FFB300 !important;
-            background-color: #1a1a1a !important;
-            padding: 2px 5px !important;
-            border-radius: 4px;
-        }}
-        pre {{
-            background-color: #1a1a1a !important;
-            border: 1px solid #444 !important;
-        }}
-
-        
         </style>
         """,
         unsafe_allow_html=True
@@ -454,6 +429,7 @@ if st.button("Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
