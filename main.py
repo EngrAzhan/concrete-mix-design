@@ -15,36 +15,38 @@ def add_bg_from_local(image_file):
         st.markdown(
         f"""
         <style>
+        /* 1. Set the background image */
         .stApp {{
             background-image: url("data:image/png;base64,{encoded_string.decode()}");
             background-attachment: fixed;
             background-size: cover;
         }}
 
-        /* Add these inside your style block */
-        .stMarkdown p, .stMarkdown b, .stMarkdown strong {
-            color: #FFFFFF !important;
-        }
-        
-        /* This fixes the visibility by making the box dark and the text white */
+        /* 2. THE VISIBILITY FIX: Dark semi-transparent cards */
         [data-testid="stVerticalBlock"] {{
             background-color: rgba(20, 20, 20, 0.85) !important;
             padding: 30px;
             border-radius: 15px;
+            backdrop-filter: blur(10px);
         }}
 
-        /* Force all text inside the app to be white */
-        .stMarkdown p, .stMarkdown b, .stMarkdown strong, label, span {{
+        /* 3. Force all normal text to White */
+        p, span, label, li, .stMarkdown, [data-testid="stMetricLabel"] {{
+            color: #FFFFFF !important;
+            font-weight: 500 !important;
+        }}
+
+        /* 4. Force Headers to Safety Orange */
+        h1, h2, h3, b, strong {{
+            color: #FFB300 !important;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }}
+
+        /* 5. Metrics and Tables text color */
+        [data-testid="stMetricValue"] {{
             color: #FFFFFF !important;
         }}
-
-        /* Keep your headers orange */
-        h1, h2, h3 {{
-            color: #FFB300 !important;
-        }}
-        
-        /* Fix the metrics (Wet/Dry Volume) */
-        [data-testid="stMetricValue"] {{
+        .stTable td, .stTable th {{
             color: #FFFFFF !important;
         }}
         </style>
@@ -255,6 +257,7 @@ def create_pdf():
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
