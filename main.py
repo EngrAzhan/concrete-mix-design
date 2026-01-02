@@ -163,7 +163,7 @@ add_bg_from_local('background.jpg')
 
 # --- NEW: HORIZONTAL HERO IMAGE ---
 # This will appear at the very top of your app content
-st.image("bg.jpg", 
+st.image("bg.jpeg", 
          use_container_width=True)
 
 # --- MAIN PAGE DISPLAY ---
@@ -294,6 +294,7 @@ def create_pdf():
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
