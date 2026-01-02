@@ -72,9 +72,9 @@ st.markdown("---")
 
 st.subheader("Mix Proportion Inputs")
 c_col, s_col, a_col = st.columns(3)
-c_ratio = c_col.number_input("Cement Ratio", value=1.0000, format="%.4f")
-s_ratio = s_col.number_input("Sand Ratio", value=2.0000, format="%.4f")
-a_ratio = a_col.number_input("Stone Ratio", value=4.0000, format="%.4f")
+c_ratio = c_col.number_input("Cement Ratio", value=1)
+s_ratio = s_col.number_input("Sand Ratio", value=2)
+a_ratio = a_col.number_input("Stone Ratio", value=4)
 
 total_ratio = c_ratio + s_ratio + a_ratio
 vol_c = (c_ratio / total_ratio) * dry_volume
@@ -144,6 +144,7 @@ st.markdown("---")
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name="Concrete_Report.pdf", mime="application/pdf")
+
 
 
 
