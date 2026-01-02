@@ -131,8 +131,8 @@ def draw_3d_specimen(l, w, h):
             i=[7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2],
             j=[3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3],
             k=[0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6],
-            opacity=0.7,
-            color='lightgrey',
+            opacity=0.9,
+            color='lightcoral',
             flatshading=True
         )
     ])
@@ -422,6 +422,7 @@ if st.button("Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
