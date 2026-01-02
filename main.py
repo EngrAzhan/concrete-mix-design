@@ -340,6 +340,7 @@ Stone Weight:  {vol_a:.4f} {v_unit} × {u_dens_a:.4f} = {weight_a:.4f} {w_unit}
 st.success(f"**Total Material Weight:** {weight_c + weight_s + weight_a:.4f} {w_unit}")
 # --- PDF GENERATION ---
 # --- FULLY ENHANCED PDF GENERATION FUNCTION ---
+# --- FULLY ENHANCED PDF GENERATION FUNCTION ---
 def create_pdf(shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, wc_ratio, 
                wet_vol, dry_vol, dry_f, waste_p, weight_c, weight_s, weight_a, weight_water, fig):
     
@@ -352,7 +353,7 @@ def create_pdf(shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, w
     pdf.line(10, 25, 200, 25)
     pdf.ln(5)
 
-    # 1. Input Parameters (As seen in image_d2a8a4.png)
+    # 1. Input Parameters
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(200, 10, "1. Input Parameters", ln=True)
     pdf.set_font("Arial", '', 11)
@@ -362,17 +363,19 @@ def create_pdf(shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, w
     pdf.cell(200, 7, f"Water-Cement Ratio: {wc_ratio}", ln=True)
     pdf.ln(5)
 
-    # 2. 3D Specimen Visualization
+    # 2. 3D Specimen Visualization (FIXED ENGINE)
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(200, 10, "2. Specimen Visualization", ln=True)
     try:
-        # This requires 'pip install kaleido'
-        img_bytes = fig.to_image(format="png", width=600, height=400)
+        # Explicitly setting engine="kaleido" to bypass browser detection errors
+        img_bytes = fig.to_image(format="png", width=600, height=400, engine="kaleido")
         img_buffer = io.BytesIO(img_bytes)
         pdf.image(img_buffer, x=40, w=130)
     except Exception as e:
+        # This will show the specific error on your Streamlit screen for troubleshooting
+        st.error(f"PDF Graph Error: {e}")
         pdf.set_font("Arial", 'I', 10)
-        pdf.cell(200, 10, "(Visualization unavailable - Install Kaleido to enable)", ln=True)
+        pdf.cell(200, 10, f"(Visualization unavailable - {str(e)})", ln=True)
     pdf.ln(5)
 
     # 3. Volume Calculations
@@ -383,17 +386,15 @@ def create_pdf(shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, w
     pdf.cell(200, 7, f"Dry Volume (DV): {dry_vol:.3f} {v_unit}", ln=True)
     pdf.ln(5)
 
-    # 4. Required Material Weights (Table Format)
+    # 4. Required Material Weights
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(200, 10, "4. Required Material Weights", ln=True)
     
-    # Table Header
     pdf.set_font("Arial", 'B', 11)
-    pdf.set_fill_color(255, 218, 185) # Peach color like your sample
+    pdf.set_fill_color(255, 218, 185) 
     pdf.cell(90, 10, "Material", 1, 0, 'C', True)
     pdf.cell(90, 10, f"Weight ({w_unit})", 1, 1, 'C', True)
     
-    # Table Body
     pdf.set_font("Arial", '', 11)
     mats = [["Cement", weight_c], ["Sand (Fine Aggregate)", weight_s], 
             ["Stone (Coarse Aggregate)", weight_a], ["Water", weight_water]]
@@ -404,20 +405,25 @@ def create_pdf(shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, w
 
     return pdf.output(dest='S').encode('latin-1')
 
-# --- UPDATED BUTTON TRIGGER ---
+# --- BUTTON TRIGGER ---
 if st.button("Generate Detailed PDF Report"):
+    # Regenerate the figure object explicitly to ensure it's fresh for the PDF
+    current_fig = draw_3d_specimen(l, w, h)
+    
     pdf_out = create_pdf(
         shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, wc_ratio,
         wet_volume, dry_volume, dry_factor, wastage_percent,
         weight_c, weight_s, weight_a, weight_water, 
-        draw_3d_specimen(l, w, h)
+        current_fig
     )
+    
     st.download_button(
         label="📥 Download Result PDF", 
         data=pdf_out, 
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
