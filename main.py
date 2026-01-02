@@ -170,7 +170,7 @@ st.markdown("### Mix Details")
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    st.image("https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=300&h=200&fit=crop")
+    st.image("cement.png")
     st.subheader("Cement")
     st.write(f"**Ratio:** {c_ratio:.1f}")
     st.write(f"**Weight:** {weight_c:.4f} {w_unit}")
@@ -257,6 +257,7 @@ def create_pdf():
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
