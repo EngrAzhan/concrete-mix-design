@@ -339,72 +339,71 @@ Stone Weight:  {vol_a:.4f} {v_unit} × {u_dens_a:.4f} = {weight_a:.4f} {w_unit}
 
 st.success(f"**Total Material Weight:** {weight_c + weight_s + weight_a:.4f} {w_unit}")
 # --- PDF GENERATION ---
-# --- FULLY ENHANCED PDF GENERATION FUNCTION ---
-# --- FULLY ENHANCED PDF GENERATION FUNCTION ---
+import tempfile
+import os
+
 def create_pdf(shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, wc_ratio, 
                wet_vol, dry_vol, dry_f, waste_p, weight_c, weight_s, weight_a, weight_water, fig):
     
     pdf = FPDF()
     pdf.add_page()
     
-    # Header
+    # --- HEADER ---
     pdf.set_font("Arial", 'B', 20)
     pdf.cell(200, 15, "Concrete Mix Quantity Report", ln=True, align='C')
     pdf.line(10, 25, 200, 25)
     pdf.ln(5)
 
-    # 1. Input Parameters
+    # --- 1. INPUT PARAMETERS ---
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(200, 10, "1. Input Parameters", ln=True)
     pdf.set_font("Arial", '', 11)
-    pdf.cell(200, 7, f"Specimen Dimensions: {l} {v_unit[0]} (L) x {h} {v_unit[0]} (H) x {w} {v_unit[0]} (W)", ln=True)
-    pdf.cell(200, 7, f"Factors: Dry Factor ({dry_f}), Wastage Factor ({1 + waste_p/100:.2f})", ln=True)
-    pdf.cell(200, 7, f"Mix Ratio (C:S:A): {c_ratio}:{s_ratio}:{a_ratio}", ln=True)
-    pdf.cell(200, 7, f"Water-Cement Ratio: {wc_ratio}", ln=True)
+    pdf.cell(200, 7, f"Specimen Type: {shape_name}", ln=True)
+    pdf.cell(200, 7, f"Dimensions: {l} {v_unit[0]} (L) x {w} {v_unit[0]} (W) x {h} {v_unit[0]} (H)", ln=True)
+    pdf.cell(200, 7, f"Factors: Dry Factor ({dry_f}), Wastage ({waste_p}%)", ln=True)
     pdf.ln(5)
 
-    # 2. 3D Specimen Visualization (FIXED ENGINE)
+    # --- 2. SPECIMEN VISUALIZATION (FIXED) ---
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(200, 10, "2. Specimen Visualization", ln=True)
-    try:
-        # Explicitly setting engine="kaleido" to bypass browser detection errors
-        img_bytes = fig.to_image(format="png", width=600, height=400, engine="kaleido")
-        img_buffer = io.BytesIO(img_bytes)
-        pdf.image(img_buffer, x=40, w=130)
-    except Exception as e:
-        # This will show the specific error on your Streamlit screen for troubleshooting
-        st.error(f"PDF Graph Error: {e}")
-        pdf.set_font("Arial", 'I', 10)
-        pdf.cell(200, 10, f"(Visualization unavailable - {str(e)})", ln=True)
-    pdf.ln(5)
-
-    # 3. Volume Calculations
-    pdf.set_font("Arial", 'B', 14)
-    pdf.cell(200, 10, "3. Volume Calculations", ln=True)
-    pdf.set_font("Arial", '', 11)
-    pdf.cell(200, 7, f"Wet Volume (WV): {wet_vol:.3f} {v_unit}", ln=True)
-    pdf.cell(200, 7, f"Dry Volume (DV): {dry_vol:.3f} {v_unit}", ln=True)
-    pdf.ln(5)
-
-    # 4. Required Material Weights
-    pdf.set_font("Arial", 'B', 14)
-    pdf.cell(200, 10, "4. Required Material Weights", ln=True)
     
+    # We use a temporary file to fix the 'rfind' error
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmpfile:
+        try:
+            # Capturing the exact 3D visual from your app
+            fig.write_image(tmpfile.name, engine="kaleido", width=600, height=400)
+            pdf.image(tmpfile.name, x=40, w=130)
+        except Exception as e:
+            st.error(f"Visualization Capture Error: {e}")
+            pdf.set_font("Arial", 'I', 10)
+            pdf.cell(200, 10, f"(Image capture failed: {str(e)})", ln=True)
+        finally:
+            tmp_path = tmpfile.name
+            
+    # Clean up the temporary file after adding to PDF
+    if os.path.exists(tmp_path):
+        os.remove(tmp_path)
+    
+    pdf.ln(5)
+
+    # --- 3. MATERIAL BREAKDOWN ---
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(200, 10, "3. Required Material Weights", ln=True)
+    
+    # Table Header (Peach color)
     pdf.set_font("Arial", 'B', 11)
     pdf.set_fill_color(255, 218, 185) 
     pdf.cell(90, 10, "Material", 1, 0, 'C', True)
     pdf.cell(90, 10, f"Weight ({w_unit})", 1, 1, 'C', True)
     
+    # Table Content
     pdf.set_font("Arial", '', 11)
-    mats = [["Cement", weight_c], ["Sand (Fine Aggregate)", weight_s], 
-            ["Stone (Coarse Aggregate)", weight_a], ["Water", weight_water]]
-    
+    mats = [["Cement", weight_c], ["Sand", weight_s], ["Stone", weight_a], ["Water", weight_water]]
     for m in mats:
         pdf.cell(90, 10, f" {m[0]}", 1)
-        pdf.cell(90, 10, f" {m[1]:.3f}", 1, 1)
+        pdf.cell(90, 10, f" {m[1]:.4f}", 1, 1)
 
     return pdf.output(dest='S').encode('latin-1')
-
 # --- BUTTON TRIGGER ---
 if st.button("Generate Detailed PDF Report"):
     # Regenerate the figure object explicitly to ensure it's fresh for the PDF
@@ -423,6 +422,7 @@ if st.button("Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
