@@ -3,6 +3,7 @@ import pandas as pd
 import base64
 import plotly.graph_objects as go
 from fpdf import FPDF
+import io
 
 # --- PAGE SETUP ---
 st.set_page_config(page_title="Concrete Calc - Pro 3D Edition", layout="wide")
@@ -417,6 +418,7 @@ if st.button("Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
