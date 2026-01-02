@@ -161,13 +161,17 @@ else: shape_name = "Specimen"
 # Apply background
 add_bg_from_local('background.jpg')
 
-# --- NEW: HORIZONTAL HERO IMAGE ---
-# This will appear at the very top of your app content
-st.image("bg.jpeg", 
-         use_container_width=True)
+# --- NEW: HORIZONTAL HERO IMAGE WITH ERROR HANDLING ---
+try:
+    st.image("bg.jpeg", use_container_width=True)
+except Exception:
+    # If bg.jpeg is missing, use a professional online placeholder to keep the app running
+    st.image("https://images.unsplash.com/photo-1541888946425-d81bb19480c5?q=80&w=2000&auto=format&fit=crop", 
+             use_container_width=True)
 
 # --- MAIN PAGE DISPLAY ---
-st.title(f"🏙 Concrete Mix Design Calculator")
+# This removes the double title and cleans up the header
+st.title("🏙 Concrete Mix Design Calculator")
 st.markdown("---")
 
 col_vis, col_inp = st.columns([1, 1])
@@ -294,6 +298,7 @@ def create_pdf():
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
