@@ -338,11 +338,9 @@ Stone Weight:  {vol_a:.4f} {v_unit} × {u_dens_a:.4f} = {weight_a:.4f} {w_unit}
 
 st.success(f"**Total Material Weight:** {weight_c + weight_s + weight_a:.4f} {w_unit}")
 # --- PDF GENERATION ---
-import io
-
-# --- UPDATED PDF GENERATION FUNCTION ---
+# --- FULLY ENHANCED PDF GENERATION FUNCTION ---
 def create_pdf(shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, wc_ratio, 
-               wet_vol, dry_vol, weight_c, weight_s, weight_a, weight_water, fig):
+               wet_vol, dry_vol, dry_f, waste_p, weight_c, weight_s, weight_a, weight_water, fig):
     
     pdf = FPDF()
     pdf.add_page()
@@ -351,63 +349,66 @@ def create_pdf(shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, w
     pdf.set_font("Arial", 'B', 20)
     pdf.cell(200, 15, "Concrete Mix Quantity Report", ln=True, align='C')
     pdf.line(10, 25, 200, 25)
-    pdf.ln(10)
+    pdf.ln(5)
 
-    # 1. Input Parameters
+    # 1. Input Parameters (As seen in image_d2a8a4.png)
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(200, 10, "1. Input Parameters", ln=True)
     pdf.set_font("Arial", '', 11)
-    pdf.cell(200, 7, f"Specimen Type: {shape_name}", ln=True)
-    pdf.cell(200, 7, f"Dimensions: {l} {v_unit[0]} (L) x {w} {v_unit[0]} (W) x {h} {v_unit[0]} (H)", ln=True)
+    pdf.cell(200, 7, f"Specimen Dimensions: {l} {v_unit[0]} (L) x {h} {v_unit[0]} (H) x {w} {v_unit[0]} (W)", ln=True)
+    pdf.cell(200, 7, f"Factors: Dry Factor ({dry_f}), Wastage Factor ({1 + waste_p/100:.2f})", ln=True)
     pdf.cell(200, 7, f"Mix Ratio (C:S:A): {c_ratio}:{s_ratio}:{a_ratio}", ln=True)
-    pdf.cell(200, 7, f"Water-Cement (W/C) Ratio: {wc_ratio}", ln=True)
+    pdf.cell(200, 7, f"Water-Cement Ratio: {wc_ratio}", ln=True)
     pdf.ln(5)
 
-    # 2. 3D Specimen Visualization (STATIC)
+    # 2. 3D Specimen Visualization
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(200, 10, "2. Specimen Visualization", ln=True)
-    # Save plotly fig to a temporary image buffer
-    img_bytes = fig.to_image(format="png", width=600, height=400)
-    img_buffer = io.BytesIO(img_bytes)
-    pdf.image(img_buffer, x=40, w=130)
+    try:
+        # This requires 'pip install kaleido'
+        img_bytes = fig.to_image(format="png", width=600, height=400)
+        img_buffer = io.BytesIO(img_bytes)
+        pdf.image(img_buffer, x=40, w=130)
+    except Exception as e:
+        pdf.set_font("Arial", 'I', 10)
+        pdf.cell(200, 10, "(Visualization unavailable - Install Kaleido to enable)", ln=True)
     pdf.ln(5)
 
-    # 3. Volume & Weight Calculations
+    # 3. Volume Calculations
     pdf.set_font("Arial", 'B', 14)
-    pdf.cell(200, 10, "3. Calculation Results", ln=True)
-    
-    # Create a table for results
-    pdf.set_font("Arial", 'B', 11)
-    pdf.set_fill_color(240, 240, 240)
-    pdf.cell(60, 10, "Material", 1, 0, 'C', True)
-    pdf.cell(60, 10, f"Volume ({v_unit})", 1, 0, 'C', True)
-    pdf.cell(60, 10, f"Weight ({w_unit})", 1, 1, 'C', True)
-    
+    pdf.cell(200, 10, "3. Volume Calculations", ln=True)
     pdf.set_font("Arial", '', 11)
-    results = [
-        ["Cement", f"{vol_c:.4f}", f"{weight_c:.4f}"],
-        ["Sand", f"{vol_s:.4f}", f"{weight_s:.4f}"],
-        ["Stone", f"{vol_a:.4f}", f"{weight_a:.4f}"],
-        ["Water", "N/A", f"{weight_water:.4f}"]
-    ]
-    
-    for row in results:
-        pdf.cell(60, 10, row[0], 1)
-        pdf.cell(60, 10, row[1], 1)
-        pdf.cell(60, 10, row[2], 1, 1)
+    pdf.cell(200, 7, f"Wet Volume (WV): {wet_vol:.3f} {v_unit}", ln=True)
+    pdf.cell(200, 7, f"Dry Volume (DV): {dry_vol:.3f} {v_unit}", ln=True)
+    pdf.ln(5)
 
-    pdf.ln(10)
-    pdf.set_font("Arial", 'I', 10)
-    pdf.cell(200, 10, "Report generated via Concrete Calc Pro 3D Edition", align='C')
+    # 4. Required Material Weights (Table Format)
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(200, 10, "4. Required Material Weights", ln=True)
+    
+    # Table Header
+    pdf.set_font("Arial", 'B', 11)
+    pdf.set_fill_color(255, 218, 185) # Peach color like your sample
+    pdf.cell(90, 10, "Material", 1, 0, 'C', True)
+    pdf.cell(90, 10, f"Weight ({w_unit})", 1, 1, 'C', True)
+    
+    # Table Body
+    pdf.set_font("Arial", '', 11)
+    mats = [["Cement", weight_c], ["Sand (Fine Aggregate)", weight_s], 
+            ["Stone (Coarse Aggregate)", weight_a], ["Water", weight_water]]
+    
+    for m in mats:
+        pdf.cell(90, 10, f" {m[0]}", 1)
+        pdf.cell(90, 10, f" {m[1]:.3f}", 1, 1)
 
     return pdf.output(dest='S').encode('latin-1')
 
-# --- BUTTON TRIGGER ---
+# --- UPDATED BUTTON TRIGGER ---
 if st.button("Generate Detailed PDF Report"):
-    # Pass all current session variables to the function
     pdf_out = create_pdf(
         shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, wc_ratio,
-        wet_volume, dry_volume, weight_c, weight_s, weight_a, weight_water, 
+        wet_volume, dry_volume, dry_factor, wastage_percent,
+        weight_c, weight_s, weight_a, weight_water, 
         draw_3d_specimen(l, w, h)
     )
     st.download_button(
