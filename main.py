@@ -28,17 +28,17 @@ def add_bg_from_local(image_file):
             border-radius: 15px;
         }}
         /* 1. FIXING THE GREY METRIC NUMBERS (image_f9c37c) */
-        [data-testid="stMetricValue"] {
+        [data-testid="stMetricValue"] {{
             color: #FFFFFF !important;
             -webkit-text-fill-color: #FFFFFF !important;
             font-weight: bold !important;
-        }
+        }}
 
         /* 2. OPTIONAL: BRIGHTEN THE LABELS ABOVE THE NUMBERS */
-        [data-testid="stMetricLabel"] p {
+        [data-testid="stMetricLabel"] p {{
             color: #FFB300 !important;
             font-size: 1.1rem !important;
-        }
+        }}
         /* 2. Header Fixes */
         [data-testid="stHeader"] {{
             background-color: white !important;
@@ -445,6 +445,7 @@ if st.button("Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
