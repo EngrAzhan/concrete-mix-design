@@ -7,6 +7,7 @@ from fpdf import FPDF
 # --- PAGE SETUP ---
 st.set_page_config(page_title="Concrete Calc - Pro 3D Edition", layout="wide")
 
+# --- FUNCTION TO SET LOCAL BACKGROUND ---
 def add_bg_from_local(image_file):
     try:
         with open(image_file, "rb") as f:
@@ -14,60 +15,23 @@ def add_bg_from_local(image_file):
         st.markdown(
         f"""
         <style>
-        /* 1. Main background */
         .stApp {{
             background-image: url("data:image/png;base64,{encoded_string.decode()}");
             background-attachment: fixed;
             background-size: cover;
         }}
-        
-        /* 2. Content Card (Glass effect) */
         [data-testid="stVerticalBlock"] {{
-            background-color: rgba(20, 20, 20, 0.85) !important; 
+            background-color: rgba(255, 255, 255, 0.94);
             padding: 30px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-        }}
-
-        /* 3. FORCE ALL TEXT TO PURE WHITE */
-        /* Targets paragraphs, markdown, labels, and all span elements */
-        p, span, label, li, div, .stMarkdown {{
-            color: #FFFFFF !important;
-            font-weight: 500 !important;
-        }}
-
-        /* 4. HEADERS: Safety Orange */
-        h1, h2, h3, b, strong {{
-            color: #FFB300 !important;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-        }}
-
-        /* 5. METRIC VALUES (The Big Numbers) */
-        [data-testid="stMetricValue"] {{
-            color: #00E5FF !important; /* Bright Cyan for numbers */
-        }}
-        
-        [data-testid="stMetricLabel"] p {{
-            color: #FFB300 !important; /* Orange for 'Wet Volume' etc. */
-        }}
-
-        /* 6. TABLE TEXT: Making result rows bright white */
-        .stTable td, .stTable th {{
-            color: #FFFFFF !important;
-            background-color: rgba(0,0,0,0.2) !important;
-        }}
-
-        /* 7. SIDEBAR TEXT: Forcing orange labels */
-        [data-testid="stSidebar"] label {{
-            color: #FFB300 !important;
-            font-weight: bold !important;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }}
         </style>
         """,
         unsafe_allow_html=True
         )
     except FileNotFoundError:
-        st.warning("Background image not found.")
+        st.warning("Background image 'background.jpg' not found.")
 
 add_bg_from_local('background.jpg')
 
@@ -75,7 +39,7 @@ add_bg_from_local('background.jpg')
 with st.sidebar:
     st.header("📐 1. Dimensions")
     unit_system = st.selectbox("Unit System", ["Metric (SI)", "Imperial (BG)"])
-    
+
     if unit_system == "Metric (SI)":
         l = st.number_input("Length (m)", value=1.0000, format="%.4f")
         w = st.number_input("Width (m)", value=1.0000, format="%.4f")
@@ -106,24 +70,23 @@ with st.sidebar:
 def draw_3d_specimen(l, w, h):
     fig = go.Figure(data=[
         go.Mesh3d(
+            # 8 vertices of the prism
             x=[0, l, l, 0, 0, l, l, 0],
             y=[0, 0, w, w, 0, 0, w, w],
             z=[0, 0, 0, 0, h, h, h, h],
             i=[7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2],
             j=[3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3],
             k=[0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6],
-            opacity=0.8,
-            color='#D3D3D3', # Light concrete grey
+            opacity=0.7,
+            color='lightgrey',
             flatshading=True
         )
     ])
     fig.update_layout(
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
         scene=dict(
-            xaxis=dict(gridcolor='gray', color='white'),
-            yaxis=dict(gridcolor='gray', color='white'),
-            zaxis=dict(gridcolor='gray', color='white'),
+            xaxis=dict(nticks=4, range=[-1, max(l,w,h)+1]),
+            yaxis=dict(nticks=4, range=[-1, max(l,w,h)+1]),
+            zaxis=dict(nticks=4, range=[-1, max(l,w,h)+1]),
             aspectmode='data'
         ),
         margin=dict(l=0, r=0, b=0, t=0),
@@ -135,6 +98,7 @@ def draw_3d_specimen(l, w, h):
 wet_volume = l * w * h
 dry_volume = wet_volume * dry_factor * wastage_factor
 
+# Identify Shape
 if l == w == h: shape_name = "Cube"
 elif l > h*2 and w > h*2: shape_name = "Slab"
 elif l > w and l > h: shape_name = "Beam"
@@ -142,6 +106,7 @@ elif h > l and h > w: shape_name = "Column"
 else: shape_name = "Specimen"
 
 # --- MAIN PAGE DISPLAY ---
+st.title(f"🏗️ 3D {shape_name} Mix Design Calculator")
 st.title(f"🏗️ Concrete Mix Design Calculator")
 st.markdown("---")
 
@@ -156,25 +121,27 @@ with col_inp:
     c_ratio = st.number_input("Cement Ratio", value=1.0000, format="%.4f")
     s_ratio = st.number_input("Sand Ratio", value=2.0000, format="%.4f")
     a_ratio = st.number_input("Stone Ratio", value=4.0000, format="%.4f")
-    
+
     total_ratio = c_ratio + s_ratio + a_ratio
     vol_c = (c_ratio / total_ratio) * dry_volume
     vol_s = (s_ratio / total_ratio) * dry_volume
     vol_a = (a_ratio / total_ratio) * dry_volume
-    
+
     weight_c = vol_c * u_dens_c
     weight_s = vol_s * u_dens_s
     weight_a = vol_a * u_dens_a
     weight_water = wc_ratio * weight_c
 
 # Results Section
+
 m1, m2 = st.columns(2)
 m1.metric("Total Wet Volume", f"{wet_volume:.4f} {v_unit}")
 m2.metric("Total Dry Volume (+Wastage)", f"{dry_volume:.4f} {v_unit}")
 
 res_df = pd.DataFrame({
-    "Material": ["Cement", "Sand", "Stone", "Water"],
-    f"Weight ({w_unit})": [f"{weight_c:.4f}", f"{weight_s:.4f}", f"{weight_a:.4f}", f"{weight_water:.4f}"]
+    "Material": ["Cement", "Sand", "Stone"],
+    f"Volume ({v_unit})": [f"{vol_c:.4f}", f"{vol_s:.4f}", f"{vol_a:.4f}"],
+    f"Weight ({w_unit})": [f"{weight_c:.4f}", f"{weight_s:.4f}", f"{weight_a:.4f}"]
 })
 st.table(res_df)
 
@@ -197,21 +164,26 @@ st.latex(r"V_{material} = \frac{\text{Ratio Part}}{\sum \text{Ratios}} \times V_
 st.code(f"Cement Vol = ({c_ratio:.4f} / {total_ratio:.4f}) × {dry_volume:.4f} = {vol_c:.4f} {v_unit}")
 
 st.markdown("### 4. Weight Conversion")
-
+st.write("We convert the calculated volume of each material into its required weight using the bulk densities provided in the sidebar.")
 st.latex(r"\text{Weight} = \text{Volume} \times \text{Density}")
+
+st.markdown("### 5. Water Content Calculation")
+st.write("Water requirement is calculated based on the weight of the cement using the Water-Cement ratio.")
+st.latex(r"W_{water} = W_{cement} \times \text{W/C Ratio}")
+st.code(f"Water Weight: {weight_c:.4f} × {wc_ratio:.4f} = {weight_water:.4f} {w_unit}")
+
+# Optional: Convert to Liters for Metric
+if unit_system == "Metric (SI)":
+    st.info(f"💡 Since 1kg of water ≈ 1 Liter, you need approximately **{weight_water:.2f} Liters** of water.")
+
+# Displaying all three material weight calculations
 st.code(f"""
 Cement Weight: {vol_c:.4f} {v_unit} × {u_dens_c:.4f} = {weight_c:.4f} {w_unit}
 Sand Weight:   {vol_s:.4f} {v_unit} × {u_dens_s:.4f} = {weight_s:.4f} {w_unit}
 Stone Weight:  {vol_a:.4f} {v_unit} × {u_dens_a:.4f} = {weight_a:.4f} {w_unit}
 """)
 
-st.markdown("### 5. Water Content Calculation")
-
-st.latex(r"W_{water} = W_{cement} \times \text{W/C Ratio}")
-st.code(f"Water Weight: {weight_c:.4f} × {wc_ratio:.4f} = {weight_water:.4f} {w_unit}")
-
-st.success(f"**Total Material Weight:** {weight_c + weight_s + weight_a + weight_water:.4f} {w_unit}")
-
+st.success(f"**Total Material Weight:** {weight_c + weight_s + weight_a:.4f} {w_unit}")
 # --- PDF GENERATION ---
 def create_pdf():
     pdf = FPDF()
@@ -220,12 +192,14 @@ def create_pdf():
     pdf.cell(200, 10, f"{shape_name} Concrete Mix Design Report", ln=True, align='C')
     pdf.ln(10)
     pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, f"Total Weight: {weight_c + weight_s + weight_a + weight_water:.4f} {w_unit}", ln=True)
+    pdf.cell(200, 10, f"Shape Detected: {shape_name}", ln=True)
+    pdf.cell(200, 10, f"Dimensions: {l}x{w}x{h} {v_unit[0]}", ln=True)
+    pdf.cell(200, 10, f"Total Weight: {weight_c + weight_s + weight_a:.4f} {w_unit}", ln=True)
     return pdf.output(dest='S').encode('latin-1')
 
 if st.button("Generate PDF Report"):
-    st.download_button(label="📥 Download Result PDF", data=create_pdf(), file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
-
+    pdf_out = create_pdf()
+    st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
 
 
 
