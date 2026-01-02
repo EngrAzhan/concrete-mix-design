@@ -63,6 +63,9 @@ with st.sidebar:
     u_dens_s = st.number_input("Sand Density", value=def_s, format="%.4f")
     u_dens_a = st.number_input("Stone Density", value=def_a, format="%.4f")
 
+    st.header("💧 4. Water Content")
+    wc_ratio = st.number_input("Water-Cement (W/C) Ratio", value=0.5000, format="%.4f")
+
 # --- 3D VISUALIZATION LOGIC ---
 def draw_3d_specimen(l, w, h):
     fig = go.Figure(data=[
@@ -126,8 +129,10 @@ with col_inp:
     weight_c = vol_c * u_dens_c
     weight_s = vol_s * u_dens_s
     weight_a = vol_a * u_dens_a
+    weight_water = wc_ratio * weight_c
 
 # Results Section
+
 m1, m2 = st.columns(2)
 m1.metric("Total Wet Volume", f"{wet_volume:.4f} {v_unit}")
 m2.metric("Total Dry Volume (+Wastage)", f"{dry_volume:.4f} {v_unit}")
@@ -161,6 +166,15 @@ st.markdown("### 4. Weight Conversion")
 st.write("We convert the calculated volume of each material into its required weight using the bulk densities provided in the sidebar.")
 st.latex(r"\text{Weight} = \text{Volume} \times \text{Density}")
 
+st.markdown("### 5. Water Content Calculation")
+st.write("Water requirement is calculated based on the weight of the cement using the Water-Cement ratio.")
+st.latex(r"W_{water} = W_{cement} \times \text{W/C Ratio}")
+st.code(f"Water Weight: {weight_c:.4f} × {wc_ratio:.4f} = {weight_water:.4f} {w_unit}")
+
+# Optional: Convert to Liters for Metric
+if unit_system == "Metric (SI)":
+    st.info(f"💡 Since 1kg of water ≈ 1 Liter, you need approximately **{weight_water:.2f} Liters** of water.")
+
 # Displaying all three material weight calculations
 st.code(f"""
 Cement Weight: {vol_c:.4f} {v_unit} × {u_dens_c:.4f} = {weight_c:.4f} {w_unit}
@@ -185,6 +199,7 @@ def create_pdf():
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
