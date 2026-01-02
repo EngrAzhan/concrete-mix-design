@@ -15,38 +15,38 @@ def add_bg_from_local(image_file):
         st.markdown(
         f"""
         <style>
-        /* 1. Set the background image */
         .stApp {{
             background-image: url("data:image/png;base64,{encoded_string.decode()}");
             background-attachment: fixed;
             background-size: cover;
         }}
 
-        /* 2. THE VISIBILITY FIX: Dark semi-transparent cards */
+        /* FIX: Darken the container and force dark-mode behavior for icons/borders */
         [data-testid="stVerticalBlock"] {{
             background-color: rgba(20, 20, 20, 0.85) !important;
             padding: 30px;
             border-radius: 15px;
-            backdrop-filter: blur(10px);
+            color-scheme: dark; /* This makes the settings icon and borders white */
         }}
 
-        /* 3. Force all normal text to White */
-        p, span, label, li, .stMarkdown, [data-testid="stMetricLabel"] {{
+        /* FIX: Ensure borders of tables and headers are visible */
+        .stTable, td, th, tr {{
+            border-color: rgba(255, 255, 255, 0.2) !important;
+        }}
+
+        /* FIX: Force all text types to White regardless of Theme */
+        .stMarkdown p, .stMarkdown b, .stMarkdown strong, label, span, div {{
             color: #FFFFFF !important;
-            font-weight: 500 !important;
         }}
 
-        /* 4. Force Headers to Safety Orange */
-        h1, h2, h3, b, strong {{
+        /* Keep your headers orange */
+        h1, h2, h3 {{
             color: #FFB300 !important;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }}
 
-        /* 5. Metrics and Tables text color */
-        [data-testid="stMetricValue"] {{
-            color: #FFFFFF !important;
-        }}
-        .stTable td, .stTable th {{
+        /* Fix the metrics specifically */
+        [data-testid="stMetricValue"], [data-testid="stMetricLabel"] {{
             color: #FFFFFF !important;
         }}
         </style>
@@ -257,6 +257,7 @@ def create_pdf():
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
