@@ -176,19 +176,19 @@ with col1:
     st.write(f"**Weight:** {weight_c:.4f} {w_unit}")
 
 with col2:
-    st.image("https://images.unsplash.com/photo-1620054366224-749e4966773a?q=80&w=300&h=200&fit=crop")
+    st.image("sand.png")
     st.subheader("Sand")
     st.write(f"**Ratio:** {s_ratio:.1f}")
     st.write(f"**Weight:** {weight_s:.4f} {w_unit}")
 
 with col3:
-    st.image("https://images.unsplash.com/photo-1541829070764-84a7d30dee6b?q=80&w=300&h=200&fit=crop")
+    st.image("coarse.png")
     st.subheader("Stone")
     st.write(f"**Ratio:** {a_ratio:.1f}")
     st.write(f"**Weight:** {weight_a:.4f} {w_unit}")
 
 with col4:
-    st.image("https://images.unsplash.com/photo-1559757175-0eb30cd8c063?q=80&w=300&h=200&fit=crop")
+    st.image("water.png")
     st.subheader("Water")
     st.write(f"**W/C Ratio:** {wc_ratio:.2f}")
     st.write(f"**Weight:** {weight_water:.4f} {w_unit}")
@@ -257,6 +257,7 @@ def create_pdf():
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
