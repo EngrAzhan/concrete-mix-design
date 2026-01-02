@@ -28,15 +28,15 @@ with st.sidebar:
 
     st.header("⚙️ 2. Design Factors")
     # Added Dry Factor and Wastage as sidebar requirements
-    dry_factor = st.number_input("Dry Volume Factor", value=1.5400, format="%.4f", help="Usually 1.54 - 1.57")
-    wastage_percent = st.number_input("Wastage (%)", value=5.0000, format="%.4f")
+    dry_factor = st.number_input("Dry Volume Factor", value=1.54, help="Usually 1.54 - 1.57")
+    wastage_percent = st.number_input("Wastage (%)", value=5)
     wastage_factor = 1 + (wastage_percent / 100)
 
     st.header("⚖️ 3. Material Densities")
     st.caption(f"Input bulk density in {w_unit}/{v_unit}")
-    u_dens_c = st.number_input("Cement Density", value=def_c, format="%.4f")
-    u_dens_s = st.number_input("Sand (FA) Density", value=def_s, format="%.4f")
-    u_dens_a = st.number_input("Stone (CA) Density", value=def_a, format="%.4f")
+    u_dens_c = st.number_input("Cement Density", value=def_c)
+    u_dens_s = st.number_input("Sand (FA) Density", value=def_s
+    u_dens_a = st.number_input("Stone (CA) Density", value=def_a
 
 # --- CALCULATIONS ---
 wet_volume = l * w * h
@@ -95,6 +95,7 @@ with tab2:
     st.code(f"Cement Weight = {vol_c:.4f} × {u_dens_c:.4f} = {weight_c:.4f} {w_unit}")
     st.code(f"Sand Weight = {vol_s:.4f} × {u_dens_s:.4f} = {weight_s:.4f} {w_unit}")
     st.code(f"Stone Weight = {vol_a:.4f} × {u_dens_a:.4f} = {weight_a:.4f} {w_unit}")
+
 
 
 
