@@ -244,6 +244,61 @@ res_df = pd.DataFrame({
 st.table(res_df)
 
 # --- METHODOLOGY ---
+# --- ADD THIS: STANDARDS & WORKABILITY SECTION ---
+st.markdown("---")
+st.header("📋 Standards & Recommended Workability")
+
+# 1. Interactive Slump Selection
+col_slump1, col_slump2 = st.columns([1, 2])
+with col_slump1:
+    st.subheader("💧 Target Slump")
+    slump_val = st.number_input("Enter Target Slump (mm)", value=100, step=5)
+    
+    # Selection logic based on ACI 211.1
+    if slump_val < 25:
+        workability = "Very Low / Stiff"
+        color = "red"
+    elif 25 <= slump_val < 75:
+        workability = "Low / Plastic"
+        color = "orange"
+    elif 75 <= slump_val < 125:
+        workability = "Medium"
+        color = "green"
+    else:
+        workability = "High / Flowing"
+        color = "blue"
+    
+    st.markdown(f"**Workability Class:** :{color}[{workability}]")
+
+with col_slump2:
+    st.subheader("ACI 211.1 Reference Guide")
+    st.write("Recommended slumps for various types of construction (Table 6.3.1):")
+    
+    standards_data = {
+        "Type of Construction": [
+            "Reinforced foundation walls and footings",
+            "Beams and reinforced walls",
+            "Building columns",
+            "Pavements and slabs",
+            "Mass concrete"
+        ],
+        "Slump (Inches)": ["1\" – 3\"", "1\" – 4\"", "1\" – 4\"", "1\" – 3\"", "1\" – 2\""],
+        "Slump (mm)": ["25 – 75 mm", "25 – 100 mm", "25 – 100 mm", "25 – 75 mm", "25 – 50 mm"]
+    }
+    st.table(pd.DataFrame(standards_data))
+
+# 2. Official Sources & Notes
+st.info("""
+**Engineering Reference:**
+* **ASTM C143:** Standard Test Method for Slump of Hydraulic-Cement Concrete.
+* **ACI 211.1:** Standard Practice for Selecting Proportions for Normal, Heavyweight, and Mass Concrete.
+""")
+
+# --- CONTINUING TO YOUR METHODOLOGY SECTION ---
+
+
+
+
 st.markdown("---")
 st.header("🧮 Step-by-Step Methodology")
 
@@ -298,6 +353,7 @@ def create_pdf():
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
