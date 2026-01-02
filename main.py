@@ -20,6 +20,11 @@ def add_bg_from_local(image_file):
             background-attachment: fixed;
             background-size: cover;
         }}
+
+        /* Add these inside your style block */
+        .stMarkdown p, .stMarkdown b, .stMarkdown strong {
+            color: #FFFFFF !important;
+        }
         
         /* This fixes the visibility by making the box dark and the text white */
         [data-testid="stVerticalBlock"] {{
@@ -250,6 +255,7 @@ def create_pdf():
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
