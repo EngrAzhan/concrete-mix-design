@@ -286,6 +286,14 @@ with col_slump1:
     
     st.markdown(f"**Workability Class:** :{color}[{workability}]")
 
+    # --- INSERTING IMAGE IN THE GAP ---
+    st.markdown("---")
+    # You can use the local file you uploaded
+    try:
+        st.image("image_ede32d.png", caption="Concrete Slump Test Procedure", use_container_width=True)
+    except:
+        st.info("💡 Image file 'image_ede32d.png' not found in directory.")
+
     # --- ADDED COMBINED SLUMP IMAGE HERE ---
     st.markdown("---")
     try:
@@ -445,6 +453,7 @@ if st.button("Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
