@@ -95,6 +95,24 @@ def add_bg_from_local(image_file):
             color: #FFFFFF !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
         }}
+
+        /* MOBILE RESPONSIVE TABLE FIX */
+        @media only screen and (max-width: 600px) {{
+            div[data-testid="stTable"] {{
+                overflow-x: auto !important;
+                display: block !important;
+                width: 100% !important;
+            }}
+            div[data-testid="stTable"] table {{
+                min-width: 600px !important; /* Forces enough width to stay readable */
+            }}
+        }}
+
+        /* ENSURE DATA TABLE HEADERS DON'T WRAP */
+        div[data-testid="stTable"] thead tr th {{
+            white-space: nowrap !important;
+            padding: 10px 20px !important;
+        }}
         </style>
         """,
         unsafe_allow_html=True
@@ -454,6 +472,7 @@ if st.button("Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
