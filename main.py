@@ -20,18 +20,27 @@ def add_bg_from_local(image_file):
             background-attachment: fixed;
             background-size: cover;
         }}
-        /* Add these inside your style block */
-       .stMarkdown p, .stMarkdown b, .stMarkdown strong {
-           color: #FFFFFF !important;
-       }
-       h3 {
-           color: #FFB300 !important; /* Safety Orange for Material Names */
-       }
+        
+        /* This fixes the visibility by making the box dark and the text white */
         [data-testid="stVerticalBlock"] {{
-            background-color: rgba(255, 255, 255, 0.94);
+            background-color: rgba(20, 20, 20, 0.85) !important;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }}
+
+        /* Force all text inside the app to be white */
+        .stMarkdown p, .stMarkdown b, .stMarkdown strong, label, span {{
+            color: #FFFFFF !important;
+        }}
+
+        /* Keep your headers orange */
+        h1, h2, h3 {{
+            color: #FFB300 !important;
+        }}
+        
+        /* Fix the metrics (Wet/Dry Volume) */
+        [data-testid="stMetricValue"] {{
+            color: #FFFFFF !important;
         }}
         </style>
         """,
@@ -241,6 +250,7 @@ def create_pdf():
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
