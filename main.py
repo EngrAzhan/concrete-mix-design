@@ -338,21 +338,85 @@ Stone Weight:  {vol_a:.4f} {v_unit} × {u_dens_a:.4f} = {weight_a:.4f} {w_unit}
 
 st.success(f"**Total Material Weight:** {weight_c + weight_s + weight_a:.4f} {w_unit}")
 # --- PDF GENERATION ---
-def create_pdf():
+import io
+
+# --- UPDATED PDF GENERATION FUNCTION ---
+def create_pdf(shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, wc_ratio, 
+               wet_vol, dry_vol, weight_c, weight_s, weight_a, weight_water, fig):
+    
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_font("Arial", 'B', 16)
-    pdf.cell(200, 10, f"{shape_name} Concrete Mix Design Report", ln=True, align='C')
+    
+    # Header
+    pdf.set_font("Arial", 'B', 20)
+    pdf.cell(200, 15, "Concrete Mix Quantity Report", ln=True, align='C')
+    pdf.line(10, 25, 200, 25)
     pdf.ln(10)
-    pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, f"Shape Detected: {shape_name}", ln=True)
-    pdf.cell(200, 10, f"Dimensions: {l}x{w}x{h} {v_unit[0]}", ln=True)
-    pdf.cell(200, 10, f"Total Weight: {weight_c + weight_s + weight_a:.4f} {w_unit}", ln=True)
+
+    # 1. Input Parameters
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(200, 10, "1. Input Parameters", ln=True)
+    pdf.set_font("Arial", '', 11)
+    pdf.cell(200, 7, f"Specimen Type: {shape_name}", ln=True)
+    pdf.cell(200, 7, f"Dimensions: {l} {v_unit[0]} (L) x {w} {v_unit[0]} (W) x {h} {v_unit[0]} (H)", ln=True)
+    pdf.cell(200, 7, f"Mix Ratio (C:S:A): {c_ratio}:{s_ratio}:{a_ratio}", ln=True)
+    pdf.cell(200, 7, f"Water-Cement (W/C) Ratio: {wc_ratio}", ln=True)
+    pdf.ln(5)
+
+    # 2. 3D Specimen Visualization (STATIC)
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(200, 10, "2. Specimen Visualization", ln=True)
+    # Save plotly fig to a temporary image buffer
+    img_bytes = fig.to_image(format="png", width=600, height=400)
+    img_buffer = io.BytesIO(img_bytes)
+    pdf.image(img_buffer, x=40, w=130)
+    pdf.ln(5)
+
+    # 3. Volume & Weight Calculations
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(200, 10, "3. Calculation Results", ln=True)
+    
+    # Create a table for results
+    pdf.set_font("Arial", 'B', 11)
+    pdf.set_fill_color(240, 240, 240)
+    pdf.cell(60, 10, "Material", 1, 0, 'C', True)
+    pdf.cell(60, 10, f"Volume ({v_unit})", 1, 0, 'C', True)
+    pdf.cell(60, 10, f"Weight ({w_unit})", 1, 1, 'C', True)
+    
+    pdf.set_font("Arial", '', 11)
+    results = [
+        ["Cement", f"{vol_c:.4f}", f"{weight_c:.4f}"],
+        ["Sand", f"{vol_s:.4f}", f"{weight_s:.4f}"],
+        ["Stone", f"{vol_a:.4f}", f"{weight_a:.4f}"],
+        ["Water", "N/A", f"{weight_water:.4f}"]
+    ]
+    
+    for row in results:
+        pdf.cell(60, 10, row[0], 1)
+        pdf.cell(60, 10, row[1], 1)
+        pdf.cell(60, 10, row[2], 1, 1)
+
+    pdf.ln(10)
+    pdf.set_font("Arial", 'I', 10)
+    pdf.cell(200, 10, "Report generated via Concrete Calc Pro 3D Edition", align='C')
+
     return pdf.output(dest='S').encode('latin-1')
 
-if st.button("Generate PDF Report"):
-    pdf_out = create_pdf()
-    st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+# --- BUTTON TRIGGER ---
+if st.button("Generate Detailed PDF Report"):
+    # Pass all current session variables to the function
+    pdf_out = create_pdf(
+        shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, wc_ratio,
+        wet_volume, dry_volume, weight_c, weight_s, weight_a, weight_water, 
+        draw_3d_specimen(l, w, h)
+    )
+    st.download_button(
+        label="📥 Download Result PDF", 
+        data=pdf_out, 
+        file_name=f"{shape_name}_Full_Report.pdf", 
+        mime="application/pdf"
+    )
+
 
 
 
