@@ -198,9 +198,17 @@ with col_vis:
 
 with col_inp:
     st.subheader("Mix Proportion Inputs")
-    c_ratio = st.number_input("Cement Ratio", value=1.0000, format="%.4f")
-    s_ratio = st.number_input("Sand Ratio", value=2.0000, format="%.4f")
-    a_ratio = st.number_input("Stone Ratio", value=4.0000, format="%.4f")
+    c_ratio = st.number_input("Cement Ratio", value=1")
+    s_ratio = st.number_input("Sand Ratio", value=2")
+    a_ratio = st.number_input("Stone Ratio", value=4")
+
+    # --- THIS FILLS THE GAP (image_ee44ea) ---
+    st.markdown("---")
+    try:
+        # Check if the file name matches your uploaded file exactly
+        st.image("image_ede32d.png", caption="Concrete Slump Test Procedure", use_container_width=True)
+    except Exception:
+        st.warning("⚠️ image_ede32d.png not found. Please check the filename in your folder.")
 
     total_ratio = c_ratio + s_ratio + a_ratio
     vol_c = (c_ratio / total_ratio) * dry_volume
@@ -286,13 +294,6 @@ with col_slump1:
     
     st.markdown(f"**Workability Class:** :{color}[{workability}]")
 
-    # --- INSERTING IMAGE IN THE GAP ---
-    st.markdown("---")
-    # You can use the local file you uploaded
-    try:
-        st.image("image_ede32d.png", caption="Concrete Slump Test Procedure", use_container_width=True)
-    except:
-        st.info("💡 Image file 'image_ede32d.png' not found in directory.")
 
     # --- ADDED COMBINED SLUMP IMAGE HERE ---
     st.markdown("---")
@@ -453,6 +454,7 @@ if st.button("Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
