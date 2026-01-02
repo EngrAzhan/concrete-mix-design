@@ -106,7 +106,7 @@ elif h > l and h > w: shape_name = "Column"
 else: shape_name = "Specimen"
 
 # --- MAIN PAGE DISPLAY ---
-st.title(f"🏗️ 3D {shape_name} Mix Design Calculator")
+st.title(f"🏗️ Concrete Mix Design Calculator")
 st.markdown("---")
 
 col_vis, col_inp = st.columns([1, 1])
@@ -199,6 +199,7 @@ def create_pdf():
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
