@@ -20,6 +20,13 @@ def add_bg_from_local(image_file):
             background-attachment: fixed;
             background-size: cover;
         }}
+        /* Add these inside your style block */
+       .stMarkdown p, .stMarkdown b, .stMarkdown strong {
+           color: #FFFFFF !important;
+       }
+       h3 {
+           color: #FFB300 !important; /* Safety Orange for Material Names */
+       }
         [data-testid="stVerticalBlock"] {{
             background-color: rgba(255, 255, 255, 0.94);
             padding: 30px;
@@ -132,16 +139,50 @@ with col_inp:
     weight_a = vol_a * u_dens_a
     weight_water = wc_ratio * weight_c
 
-# Results Section
+# --- RESULTS SECTION WITH IMAGES ---
+st.markdown("---")
+st.header("🧱 Material Breakdown & Requirements")
 
+# 1. Top Metrics for Volumes
 m1, m2 = st.columns(2)
 m1.metric("Total Wet Volume", f"{wet_volume:.4f} {v_unit}")
 m2.metric("Total Dry Volume (+Wastage)", f"{dry_volume:.4f} {v_unit}")
 
+st.markdown("### Mix Details")
+
+# 2. Visual Cards for Materials
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    st.image("https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?q=80&w=300&h=200&fit=crop")
+    st.subheader("Cement")
+    st.write(f"**Ratio:** {c_ratio:.1f}")
+    st.write(f"**Weight:** {weight_c:.4f} {w_unit}")
+
+with col2:
+    st.image("https://images.unsplash.com/photo-1620054366224-749e4966773a?q=80&w=300&h=200&fit=crop")
+    st.subheader("Sand")
+    st.write(f"**Ratio:** {s_ratio:.1f}")
+    st.write(f"**Weight:** {weight_s:.4f} {w_unit}")
+
+with col3:
+    st.image("https://images.unsplash.com/photo-1541829070764-84a7d30dee6b?q=80&w=300&h=200&fit=crop")
+    st.subheader("Stone")
+    st.write(f"**Ratio:** {a_ratio:.1f}")
+    st.write(f"**Weight:** {weight_a:.4f} {w_unit}")
+
+with col4:
+    st.image("https://images.unsplash.com/photo-1559757175-0eb30cd8c063?q=80&w=300&h=200&fit=crop")
+    st.subheader("Water")
+    st.write(f"**W/C Ratio:** {wc_ratio:.2f}")
+    st.write(f"**Weight:** {weight_water:.4f} {w_unit}")
+
+# Keep the table below for official reference if needed
+st.markdown("#### Official Data Table")
 res_df = pd.DataFrame({
-    "Material": ["Cement", "Sand", "Stone"],
-    f"Volume ({v_unit})": [f"{vol_c:.4f}", f"{vol_s:.4f}", f"{vol_a:.4f}"],
-    f"Weight ({w_unit})": [f"{weight_c:.4f}", f"{weight_s:.4f}", f"{weight_a:.4f}"]
+    "Material": ["Cement", "Sand", "Stone", "Water"],
+    "Ratio": [c_ratio, s_ratio, a_ratio, wc_ratio],
+    f"Weight ({w_unit})": [f"{weight_c:.4f}", f"{weight_s:.4f}", f"{weight_a:.4f}", f"{weight_water:.4f}"]
 })
 st.table(res_df)
 
@@ -200,6 +241,7 @@ def create_pdf():
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
