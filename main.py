@@ -17,27 +17,29 @@ with st.sidebar:
         w = st.number_input("Width (m)", value=1.0)
         h = st.number_input("Height (m)", value=1.0)
         v_unit, w_unit = "m³", "kg"
-        # Default SI Densities
         def_c, def_s, def_a = 1440.0, 1600.0, 1550.0
     else:
         l = st.number_input("Length (ft)", value=1.0)
         w = st.number_input("Width (ft)", value=1.0)
         h = st.number_input("Height (ft)", value=1.0)
         v_unit, w_unit = "ft³", "lb"
-        # Default Imperial Densities
         def_c, def_s, def_a = 94.0, 100.0, 105.0
 
-    st.header("⚖️ 2. Material Densities")
-    st.caption(f"Input bulk density in {w_unit}/{v_unit}")
+    # --- NEW INPUTS ADDED HERE ---
+    st.header("⚙️ 2. Design Factors")
+    dry_factor = st.number_input("Dry Volume Factor", value=1.54, help="Commonly 1.54 to 1.57")
+    wastage_percent = st.number_input("Wastage (%)", value=5.0)
+    wastage_factor = 1 + (wastage_percent / 100)
+
+    st.header("⚖️ 3. Material Densities")
     u_dens_c = st.number_input("Cement Density", value=def_c)
     u_dens_s = st.number_input("Sand (FA) Density", value=def_s)
     u_dens_a = st.number_input("Stone (CA) Density", value=def_a)
 
 # --- CALCULATIONS ---
 wet_volume = l * w * h
-dry_factor = 1.54  # Standard shrinkage factor
-wastage = 1.05    # 5% safety margin
-dry_volume = wet_volume * dry_factor * wastage
+# Now using the inputs from the sidebar instead of fixed numbers
+dry_volume = wet_volume * dry_factor * wastage_factor
 
 # --- TABS FOR USER EXPERIENCE ---
 tab1, tab2 = st.tabs(["📊 Calculator Results", "📝 How it Works (Formulas)"])
@@ -96,3 +98,4 @@ with tab2:
     st.code(f"Cement Weight = {vol_c:.3f} × {u_dens_c} = {weight_c:.2f} {w_unit}")
     st.code(f"Sand Weight = {vol_s:.3f} × {u_dens_s} = {weight_s:.2f} {w_unit}")
     st.code(f"Stone Weight = {vol_a:.3f} × {u_dens_a} = {weight_a:.2f} {w_unit}")
+
