@@ -198,9 +198,9 @@ with col_vis:
 
 with col_inp:
     st.subheader("Mix Proportion Inputs")
-    c_ratio = st.number_input("Cement Ratio", value=1")
-    s_ratio = st.number_input("Sand Ratio", value=2")
-    a_ratio = st.number_input("Stone Ratio", value=4")
+    c_ratio = st.number_input("Cement Ratio", value=1)
+    s_ratio = st.number_input("Sand Ratio", value=2)
+    a_ratio = st.number_input("Stone Ratio", value=4)
 
     # --- THIS FILLS THE GAP (image_ee44ea) ---
     st.markdown("---")
@@ -454,6 +454,7 @@ if st.button("Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
