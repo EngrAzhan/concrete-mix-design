@@ -163,7 +163,7 @@ add_bg_from_local('background.jpg')
 
 # --- NEW: HORIZONTAL HERO IMAGE WITH ERROR HANDLING ---
 try:
-    st.image("bg.jpeg", use_container_width=True)
+    st.image("bg.jpg", use_container_width=True)
 except Exception:
     # If bg.jpeg is missing, use a professional online placeholder to keep the app running
     st.image("https://images.unsplash.com/photo-1541888946425-d81bb19480c5?q=80&w=2000&auto=format&fit=crop", 
@@ -298,6 +298,7 @@ def create_pdf():
 if st.button("Generate PDF Report"):
     pdf_out = create_pdf()
     st.download_button(label="📥 Download Result PDF", data=pdf_out, file_name=f"{shape_name}_Report.pdf", mime="application/pdf")
+
 
 
 
