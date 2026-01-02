@@ -178,7 +178,7 @@ st.markdown("---")
 col_vis, col_inp = st.columns([1, 1])
 
 with col_vis:
-    st.subheader(f"3D {shape_name} Visualization")
+    st.subheader(f"3D Specimen ({shape_name}) Visualization")
     st.plotly_chart(draw_3d_specimen(l, w, h), use_container_width=True)
 
 with col_inp:
@@ -422,6 +422,7 @@ if st.button("Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
