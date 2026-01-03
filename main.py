@@ -115,6 +115,28 @@ def add_bg_from_local(image_file):
             white-space: nowrap !important;
             padding: 10px 20px !important;
         }}
+        /* 1. MOBILE SIDEBAR VISIBILITY FIX */
+        [data-testid="stSidebar"] {{
+            background-color: #1a1a1a !important; /* Force dark background on mobile */
+        }}
+        
+        [data-testid="stSidebar"] .stMarkdown p, 
+        [data-testid="stSidebar"] label {{
+            color: #FFFFFF !important; /* Force white text for labels */
+            font-weight: bold !important;
+        }}
+
+        /* 2. FIXING THE "INVISIBLE" INPUT BOXES ON MOBILE */
+        div[data-baseweb="input"] {{
+            background-color: #333333 !important;
+            border: 1px solid #FFB300 !important;
+        }}
+
+        /* 3. METRIC TEXT FILL (CRITICAL FOR MOBILE CHROME/SAFARI) */
+        [data-testid="stMetricValue"] {{
+            color: #FFFFFF !important;
+            -webkit-text-fill-color: #FFFFFF !important; 
+        }}
         </style>
         """,
         unsafe_allow_html=True
@@ -497,6 +519,7 @@ if st.button("🚀 Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
