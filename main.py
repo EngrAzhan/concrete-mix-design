@@ -393,52 +393,78 @@ import tempfile
 import os
 
 def create_pdf(shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, wc_ratio, 
-               wet_vol, dry_vol, dry_f, waste_p, weight_c, weight_s, weight_a, weight_water, fig):
+               wet_vol, dry_vol, dry_f, waste_p, weight_c, weight_s, weight_a, weight_water, 
+               fig, slump_val, workability):
     
     pdf = FPDF()
     pdf.add_page()
     
-    # --- HEADER ---
+    # --- 1. HEADER ---
     pdf.set_font("Arial", 'B', 20)
-    pdf.cell(200, 15, "Concrete Mix Quantity Report", ln=True, align='C')
+    pdf.set_text_color(255, 179, 0) # Gold theme color
+    pdf.cell(200, 15, "Concrete Mix Quantity & Workability Report", ln=True, align='C')
+    pdf.set_draw_color(255, 179, 0)
     pdf.line(10, 25, 200, 25)
     pdf.ln(5)
 
-    # --- 1. INPUT PARAMETERS ---
+    # --- 2. DESIGN SPECS & SLUMP ---
+    pdf.set_text_color(0, 0, 0)
     pdf.set_font("Arial", 'B', 14)
-    pdf.cell(200, 10, "1. Input Parameters", ln=True)
+    pdf.cell(200, 10, "1. Design Specifications", ln=True)
     pdf.set_font("Arial", '', 11)
-    pdf.cell(200, 7, f"Specimen Type: {shape_name}", ln=True)
-    pdf.cell(200, 7, f"Dimensions: {l} {v_unit[0]} (L) x {w} {v_unit[0]} (W) x {h} {v_unit[0]} (H)", ln=True)
-    pdf.cell(200, 7, f"Factors: Dry Factor ({dry_f}), Wastage ({waste_p}%)", ln=True)
+    
+    pdf.cell(90, 7, f"Specimen Type: {shape_name}", ln=0)
+    pdf.cell(90, 7, f"W/C Ratio: {wc_ratio}", ln=1)
+    pdf.cell(90, 7, f"Target Slump: {slump_val} mm", ln=0)
+    pdf.cell(90, 7, f"Workability: {workability}", ln=1)
     pdf.ln(5)
 
-    # --- 2. SPECIMEN VISUALIZATION (FIXED) ---
+    # --- 3. 3D VISUALIZATION ---
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(200, 10, "2. Specimen Visualization", ln=True)
-    
-    # We use a temporary file to fix the 'rfind' error
     with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmpfile:
         try:
-            # Capturing the exact 3D visual from your app
             fig.write_image(tmpfile.name, engine="kaleido", width=600, height=400)
             pdf.image(tmpfile.name, x=40, w=130)
-        except Exception as e:
-            st.error(f"Visualization Capture Error: {e}")
-            pdf.set_font("Arial", 'I', 10)
-            pdf.cell(200, 10, f"(Image capture failed: {str(e)})", ln=True)
+        except:
+            pdf.cell(200, 10, "(Image capture failed)", ln=True)
         finally:
             tmp_path = tmpfile.name
-            
-    # Clean up the temporary file after adding to PDF
     if os.path.exists(tmp_path):
         os.remove(tmp_path)
-    
     pdf.ln(5)
 
-    # --- 3. MATERIAL BREAKDOWN ---
+    # --- 4. MATERIAL TABLE ---
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(200, 10, "3. Required Material Weights", ln=True)
+    pdf.set_font("Arial", 'B', 11)
+    pdf.set_fill_color(255, 179, 0) 
+    pdf.cell(60, 10, "Material", 1, 0, 'C', True)
+    pdf.cell(60, 10, "Ratio", 1, 0, 'C', True)
+    pdf.cell(60, 10, f"Weight ({w_unit})", 1, 1, 'C', True)
+    
+    pdf.set_font("Arial", '', 11)
+    mats = [["Cement", c_ratio, weight_c], ["Sand", s_ratio, weight_s], 
+            ["Stone", a_ratio, weight_a], ["Water", wc_ratio, weight_water]]
+    for m in mats:
+        pdf.cell(60, 10, f" {m[0]}", 1)
+        pdf.cell(60, 10, f" {m[1]}", 1, 0, 'C')
+        pdf.cell(60, 10, f" {m[2]:.4f}", 1, 1, 'C')
+
+    # --- 5. METHODOLOGY ---
+    pdf.ln(10)
+    pdf.set_font("Arial", 'B', 14)
+    pdf.cell(200, 10, "4. Step-by-Step Methodology", ln=True)
+    pdf.set_font("Arial", '', 10)
+    method = [
+        f"1. Wet Volume (LxWxH): {wet_vol:.4f} {v_unit}",
+        f"2. Dry Volume (incl. {waste_p}% wastage): {dry_vol:.4f} {v_unit}",
+        f"3. Total Material Weight: {weight_c + weight_s + weight_a:.4f} {w_unit}"
+    ]
+    for step in method:
+        pdf.multi_cell(0, 7, step)
+
+    return pdf.output(dest='S').encode('latin-1')
     
     # Table Header (Peach color)
     pdf.set_font("Arial", 'B', 11)
@@ -464,6 +490,23 @@ if st.button("Generate Detailed PDF Report"):
         wet_volume, dry_volume, dry_factor, wastage_percent,
         weight_c, weight_s, weight_a, weight_water, 
         current_fig
+    )
+    
+    st.download_button(
+        label="📥 Download Result PDF", 
+        data=pdf_out, 
+        file_name=f"{shape_name}_Full_Report.pdf", 
+        mime="application/pdf"
+    )
+if st.button("Generate Detailed PDF Report"):
+    current_fig = draw_3d_specimen(l, w, h)
+    
+    # Pass slump_val and workability to the function
+    pdf_out = create_pdf(
+        shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, wc_ratio,
+        wet_volume, dry_volume, dry_factor, wastage_percent,
+        weight_c, weight_s, weight_a, weight_water, 
+        current_fig, slump_val, workability # <--- New arguments
     )
     
     st.download_button(
