@@ -392,6 +392,10 @@ st.success(f"**Total Material Weight:** {weight_c + weight_s + weight_a:.4f} {w_
 import tempfile
 import os
 
+# --- PDF GENERATION ---
+import tempfile
+import os
+
 def create_pdf(shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, wc_ratio, 
                wet_vol, dry_vol, dry_f, waste_p, weight_c, weight_s, weight_a, weight_water, 
                fig, slump_val, workability):
@@ -407,16 +411,19 @@ def create_pdf(shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, w
     pdf.line(10, 25, 200, 25)
     pdf.ln(5)
 
-    # --- 2. DESIGN SPECS & SLUMP ---
+    # --- 2. DESIGN SPECS & SLUMP DATA ---
     pdf.set_text_color(0, 0, 0)
     pdf.set_font("Arial", 'B', 14)
     pdf.cell(200, 10, "1. Design Specifications", ln=True)
     pdf.set_font("Arial", '', 11)
     
-    pdf.cell(90, 7, f"Specimen Type: {shape_name}", ln=0)
-    pdf.cell(90, 7, f"W/C Ratio: {wc_ratio}", ln=1)
-    pdf.cell(90, 7, f"Target Slump: {slump_val} mm", ln=0)
-    pdf.cell(90, 7, f"Workability: {workability}", ln=1)
+    col_width = 90
+    pdf.cell(col_width, 7, f"Specimen Type: {shape_name}", ln=0)
+    pdf.cell(col_width, 7, f"W/C Ratio: {wc_ratio}", ln=1)
+    pdf.cell(col_width, 7, f"Target Slump: {slump_val} mm", ln=0)
+    pdf.cell(col_width, 7, f"Workability: {workability}", ln=1)
+    pdf.cell(col_width, 7, f"Dry Factor: {dry_f}", ln=0)
+    pdf.cell(col_width, 7, f"Wastage: {waste_p}%", ln=1)
     pdf.ln(5)
 
     # --- 3. 3D VISUALIZATION ---
@@ -426,8 +433,9 @@ def create_pdf(shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, w
         try:
             fig.write_image(tmpfile.name, engine="kaleido", width=600, height=400)
             pdf.image(tmpfile.name, x=40, w=130)
-        except:
-            pdf.cell(200, 10, "(Image capture failed)", ln=True)
+        except Exception:
+            pdf.set_font("Arial", 'I', 10)
+            pdf.cell(200, 10, "(Image capture failed: Ensure kaleido is installed)", ln=True)
         finally:
             tmp_path = tmpfile.name
     if os.path.exists(tmp_path):
@@ -457,56 +465,28 @@ def create_pdf(shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, w
     pdf.cell(200, 10, "4. Step-by-Step Methodology", ln=True)
     pdf.set_font("Arial", '', 10)
     method = [
-        f"1. Wet Volume (LxWxH): {wet_vol:.4f} {v_unit}",
-        f"2. Dry Volume (incl. {waste_p}% wastage): {dry_vol:.4f} {v_unit}",
-        f"3. Total Material Weight: {weight_c + weight_s + weight_a:.4f} {w_unit}"
+        f"Step 1: Wet Volume (LxWxH) = {wet_vol:.4f} {v_unit}",
+        f"Step 2: Dry Volume (incl. {waste_p}% wastage) = {dry_vol:.4f} {v_unit}",
+        f"Step 3: Total Weight (C+S+A+W) = {weight_c + weight_s + weight_a + weight_water:.4f} {w_unit}",
+        f"Step 4: Slump Verification = {slump_val}mm (Class: {workability})"
     ]
     for step in method:
         pdf.multi_cell(0, 7, step)
 
     return pdf.output(dest='S').encode('latin-1')
-    
-    # Table Header (Peach color)
-    pdf.set_font("Arial", 'B', 11)
-    pdf.set_fill_color(255, 218, 185) 
-    pdf.cell(90, 10, "Material", 1, 0, 'C', True)
-    pdf.cell(90, 10, f"Weight ({w_unit})", 1, 1, 'C', True)
-    
-    # Table Content
-    pdf.set_font("Arial", '', 11)
-    mats = [["Cement", weight_c], ["Sand", weight_s], ["Stone", weight_a], ["Water", weight_water]]
-    for m in mats:
-        pdf.cell(90, 10, f" {m[0]}", 1)
-        pdf.cell(90, 10, f" {m[1]:.4f}", 1, 1)
 
-    return pdf.output(dest='S').encode('latin-1')
-# --- BUTTON TRIGGER ---
-if st.button("Generate Detailed PDF Report"):
-    # Regenerate the figure object explicitly to ensure it's fresh for the PDF
+# --- FINAL BUTTON TRIGGER ---
+st.markdown("---")
+if st.button("🚀 Generate Detailed PDF Report"):
+    # Generate fresh visual for PDF
     current_fig = draw_3d_specimen(l, w, h)
     
+    # Build PDF with all data including Slump
     pdf_out = create_pdf(
         shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, wc_ratio,
         wet_volume, dry_volume, dry_factor, wastage_percent,
         weight_c, weight_s, weight_a, weight_water, 
-        current_fig
-    )
-    
-    st.download_button(
-        label="📥 Download Result PDF", 
-        data=pdf_out, 
-        file_name=f"{shape_name}_Full_Report.pdf", 
-        mime="application/pdf"
-    )
-if st.button("Generate Detailed PDF Report"):
-    current_fig = draw_3d_specimen(l, w, h)
-    
-    # Pass slump_val and workability to the function
-    pdf_out = create_pdf(
-        shape_name, l, w, h, v_unit, w_unit, c_ratio, s_ratio, a_ratio, wc_ratio,
-        wet_volume, dry_volume, dry_factor, wastage_percent,
-        weight_c, weight_s, weight_a, weight_water, 
-        current_fig, slump_val, workability # <--- New arguments
+        current_fig, slump_val, workability
     )
     
     st.download_button(
