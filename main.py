@@ -151,25 +151,46 @@ def add_bg_from_local(image_file):
             border-radius: 50% !important;
         }}
 
-        /* 1. FIX INVISIBLE DROPDOWN MENU TEXT (image_3f2b02) */
-        div[data-baseweb="popover"] ul {{
-            background-color: #1a1a1a !important; /* Force dark background for menu */
-        }}
-        div[data-baseweb="popover"] li {{
-            color: #1a1a1a !important; /* Force black text on the dark background */
-        }}
-        div[data-baseweb="popover"] li:hover {{
-            background-color: #FFB300 !important; /* Gold hover effect */
-            color: #000000 !important;
+        /* 1. MAIN THEME COLORS */
+        .stApp {
+            background-image: url("data:image/png;base64,{encoded_string.decode()}");
+            background-attachment: fixed;
+            background-size: cover;
         }}
 
-        /* 2. FIX INVISIBLE HEADER BUTTONS (image_3f1ba2) */
+        /* 2. HEADER FIX: FORCE BLACK BACKGROUND FOR WHITE ICONS (image_3f1ba2) */
         header[data-testid="stHeader"] {{
-            background-color: #000000 !important; /* Force black header */
+            background-color: #000000 !important;
         }}
         header[data-testid="stHeader"] svg {{
-            fill: #FFFFFF !important; /* Force white icons (GitHub/Menu) */
+            fill: #FFFFFF !important; /* Forces GitHub/Sidebar icons to be white */
         }}
+
+        /* 3. DROPDOWN FIX: FORCE BLACK TEXT ON WHITE BACKGROUND (image_3f2b02) */
+        div[data-baseweb="popover"] li, 
+        div[data-baseweb="popover"] span {{
+            color: #000000 !important; /* Forces black text in the dropdown */
+        }}
+
+        /* 4. SIDEBAR & INPUTS (image_3349bb) */
+        [data-testid="stSidebar"] {{
+            background-color: #1a1a1a !important;
+            min-width: 250px !important;
+        }}
+        
+        [data-testid="stSidebar"] label, .stMarkdown p {{
+            color: #FFFFFF !important;
+        }}
+
+        /* 5. METRICS VISIBILITY (image_f9c37c) */
+        [data-testid="stMetricValue"] {{
+            color: #FFFFFF !important;
+            -webkit-text-fill-color: #FFFFFF !important; 
+        }}
+
+        /* 6. GLOBAL TEXT */
+        h1, h2, h3, h4 { color: #FFB300 !important; }
+        </style>
         </style>
         """,
         unsafe_allow_html=True
@@ -552,6 +573,7 @@ if st.button("🚀 Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
