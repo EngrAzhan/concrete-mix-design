@@ -150,6 +150,26 @@ def add_bg_from_local(image_file):
             color: #000000 !important; /* Black icon */
             border-radius: 50% !important;
         }}
+
+        /* 1. FIX INVISIBLE DROPDOWN MENU TEXT (image_3f2b02) */
+        div[data-baseweb="popover"] ul {{
+            background-color: #1a1a1a !important; /* Force dark background for menu */
+        }}
+        div[data-baseweb="popover"] li {{
+            color: #FFFFFF !important; /* Force white text on the dark background */
+        }}
+        div[data-baseweb="popover"] li:hover {{
+            background-color: #FFB300 !important; /* Gold hover effect */
+            color: #000000 !important;
+        }}
+
+        /* 2. FIX INVISIBLE HEADER BUTTONS (image_3f1ba2) */
+        header[data-testid="stHeader"] {{
+            background-color: #000000 !important; /* Force black header */
+        }}
+        header[data-testid="stHeader"] svg {{
+            fill: #FFFFFF !important; /* Force white icons (GitHub/Menu) */
+        }}
         </style>
         """,
         unsafe_allow_html=True
@@ -532,6 +552,7 @@ if st.button("🚀 Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
