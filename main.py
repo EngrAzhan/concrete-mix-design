@@ -156,7 +156,7 @@ def add_bg_from_local(image_file):
             background-color: #1a1a1a !important; /* Force dark background for menu */
         }}
         div[data-baseweb="popover"] li {{
-            color: #FFFFFF !important; /* Force white text on the dark background */
+            color: #1a1a1a !important; /* Force black text on the dark background */
         }}
         div[data-baseweb="popover"] li:hover {{
             background-color: #FFB300 !important; /* Gold hover effect */
@@ -552,6 +552,7 @@ if st.button("🚀 Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
