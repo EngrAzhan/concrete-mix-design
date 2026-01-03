@@ -139,7 +139,7 @@ def add_bg_from_local(image_file):
         }}
 
         /* 1. FORCE DARK HEADER FOR MOBILE VISIBILITY (image_3f1ba2) */
-        header[data-testid="stHeader"] {
+        header[data-testid="stHeader"] {{
             background-color: rgba(20, 20, 20, 0.9) !important;
             color: white !important;
         }}
@@ -532,6 +532,7 @@ if st.button("🚀 Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
