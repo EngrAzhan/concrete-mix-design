@@ -191,7 +191,6 @@ def add_bg_from_local(image_file):
         /* 6. GLOBAL TEXT */
         h1, h2, h3, h4 { color: #FFB300 !important; }
         </style>
-        </style>
         """,
         unsafe_allow_html=True
         )
@@ -573,6 +572,7 @@ if st.button("🚀 Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
