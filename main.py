@@ -152,7 +152,7 @@ def add_bg_from_local(image_file):
         }}
 
         /* 1. MAIN THEME COLORS */
-        .stApp {
+        .stApp {{
             background-image: url("data:image/png;base64,{encoded_string.decode()}");
             background-attachment: fixed;
             background-size: cover;
@@ -572,6 +572,7 @@ if st.button("🚀 Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
