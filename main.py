@@ -137,6 +137,19 @@ def add_bg_from_local(image_file):
             color: #FFFFFF !important;
             -webkit-text-fill-color: #FFFFFF !important; 
         }}
+
+        /* 1. FORCE DARK HEADER FOR MOBILE VISIBILITY (image_3f1ba2) */
+        header[data-testid="stHeader"] {
+            background-color: rgba(20, 20, 20, 0.9) !important;
+            color: white !important;
+        }}
+
+        /* 2. MAKE SIDEBAR BUTTON VISIBLE (The arrow/hamburger) */
+        button[data-testid="sidebar-button"] {{
+            background-color: #FFB300 !important; /* Gold background */
+            color: #000000 !important; /* Black icon */
+            border-radius: 50% !important;
+        }}
         </style>
         """,
         unsafe_allow_html=True
@@ -519,6 +532,7 @@ if st.button("🚀 Generate Detailed PDF Report"):
         file_name=f"{shape_name}_Full_Report.pdf", 
         mime="application/pdf"
     )
+
 
 
 
